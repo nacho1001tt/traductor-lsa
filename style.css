@@ -1,0 +1,63 @@
+/* Fondo y estructura básica */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff; /* Color de fondo más claro */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Título */
+h1 {
+    color: #4A90E2;  /* Un color azul más vivo */
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombras en el texto */
+}
+
+/* Botón */
+button {
+    background-color: #4CAF50; /* Un verde más brillante */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil en el botón */
+    transition: background-color 0.3s, transform 0.2s ease-in-out; /* Efecto de transición */
+}
+
+/* Efecto al pasar el ratón por encima del botón */
+button:hover {
+    background-color: #45a049; /* Cambio de color al pasar el ratón */
+    transform: scale(1.05);  /* Aumento del tamaño */
+}
+
+/* Área del texto */
+#texto {
+    font-size: 18px;
+    color: #333;
+    margin-top: 20px;
+    max-width: 80%;
+    text-align: center;
+}
+
+/* Imagen de la seña */
+#imagenSeña {
+    width: 350px;
+    margin-top: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra en la imagen */
+    transition: transform 0.3s ease-in-out; /* Efecto de transición */
+}
+
+/* Efecto al pasar el ratón por encima de la imagen */
+#imagenSeña:hover {
+    transform: scale(1.05); /* Aumento de tamaño de la imagen */
+}
