@@ -15,9 +15,9 @@ function mostrarSeña(speechText) {
     let nombreArchivo = "desconocido.gif";
 
     if (speechText.includes("hola")) {
-        nombreArchivo = "hola.gif";
-    } else if (speechText.includes("gracias")) {
-        nombreArchivo = "como estas.gif";
+        nombreArchivo = "hola.gif,mp4";
+    } else if (speechText.includes("como estas")) {
+        nombreArchivo = "como estas.gif.mp4";
     }
 
     function reproducirGif() {
