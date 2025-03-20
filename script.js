@@ -1,7 +1,7 @@
 // Capturamos los elementos del HTML
 const boton = document.getElementById('start');
 const texto = document.getElementById('texto');
-const imagenSeña = document.getElementById('imagenSeña');
+const videoSeña = document.getElementById('videoSeña');
 
 // Configuramos el reconocimiento de voz
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -11,36 +11,23 @@ boton.addEventListener('click', () => {
     reconocimiento.start(); // Inicia el reconocimiento de voz
 });
 
-function mostrarSeña(speechText) {
-    let nombreArchivo = "desconocido.gif.mp4";
-
-    if (speechText.includes("hola")) {
-        nombreArchivo = "hola.gif.mp4";
-    } else if (speechText.includes("como estas")) {
-        nombreArchivo = "cómo estás.gif.mp4";
-    }
-
-    function reproducirGif() {
-        imagenSeña.src = "imagenes/" + nombreArchivo;
-        setTimeout(() => {
-            imagenSeña.src = ""; // Borra la imagen para reiniciar el GIF
-            setTimeout(() => {
-                imagenSeña.src = "imagenes/" + nombreArchivo; // Segunda repetición del GIF
-                setTimeout(() => {
-                    imagenSeña.src = ""; // Borra la imagen tras la segunda repetición
-                }, 200); // Delay de 200 ms después de la segunda repetición
-            }, 100); // Pequeña pausa antes de la segunda repetición
-        }, 1000); // Ajusta este tiempo según la duración de los GIFs
-    }
-
-    reproducirGif();
-}
-
 reconocimiento.onresult = (event) => {
     const speechText = event.results[0][0].transcript.toLowerCase();
     texto.textContent = speechText;
-    
-    setTimeout(() => {
-        mostrarSeña(speechText);
-    }, 200); // Delay de 200 ms entre palabras
+
+    // Cambiamos el video según la palabra detectada
+    if (speechText.includes("hola")) {
+        actualizarVideo("Palabras/hola.mp4");
+    } else if (speechText.includes("como estas")) {
+        actualizarVideo("Palabras/como estas.mp4");
+    } else {
+        texto.textContent = "No se encontró una seña para esta palabra.";
+    }
 };
+
+// Función para actualizar el video con repetición
+function actualizarVideo(ruta) {
+    videoSeña.src = ruta;  // Cambia el video
+    videoSeña.load();  // Recarga el video
+    videoSeña.play();  // Lo reproduce nuevamente
+}
