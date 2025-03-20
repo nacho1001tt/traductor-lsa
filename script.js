@@ -12,7 +12,7 @@ boton.addEventListener('click', () => {
 });
 
 function mostrarSeña(speechText) {
-    let nombreArchivo = "desconocido.gif";
+    let nombreArchivo = "desconocido.gif.mp4";
 
     if (speechText.includes("hola")) {
         nombreArchivo = "hola.gif,mp4";
