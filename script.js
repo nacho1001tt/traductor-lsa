@@ -4,6 +4,9 @@ const texto = document.getElementById('texto');
 const videoSeña = document.getElementById('videoSeña');
 const videoSource = document.getElementById('videoSource');
 
+// Ocultar el video al cargar la página
+videoSeña.style.display = "none"; 
+
 // Configuramos el reconocimiento de voz
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 reconocimiento.lang = 'es-ES'; // Idioma español
@@ -25,10 +28,10 @@ reconocimiento.onresult = (event) => {
         videoPath = "Palabras/como estas.mp4";
     }
 
-    // Si se detectó una palabra válida, actualiza el video y lo muestra
+    // Si se detectó una palabra válida, actualizar el video y mostrarlo
     if (videoPath) {
         videoSource.src = videoPath;
-        videoSeña.load(); // Recargar el video con la nueva fuente
+        videoSeña.load(); // Cargar el nuevo video
         videoSeña.style.display = "block"; // Mostrar el video
         videoSeña.play();
     } else {
