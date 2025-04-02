@@ -25,7 +25,7 @@ reconocimiento.onresult = (event) => {
     if (speechText.includes("hola")) {
         videoPath = "Palabras/hola.mp4";
     } else if (speechText.includes("cómo estás")) {
-        videoPath = "Palabras/cómo estás.mp4";
+        videoPath = "Palabras/comoestas.mp4";
     }
 
     // Si se detectó una palabra válida, actualizar el video y mostrarlo
