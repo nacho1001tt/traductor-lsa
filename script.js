@@ -22,12 +22,14 @@ reconocimiento.onresult = (event) => {
     let videoPath = "";
 
     // Asignamos el video según la palabra detectada
-    if (speechText.includes("hola")) {
-        videoPath = "Palabras/hola.mp4";
-    } else if (speechText.includes("como estas") || speechText.includes("cómo estás")) {
-        videoPath = "Palabras/comoestas.mp4";
-    if (speechText.includes("vos cómo te llamas")) {
-        videoPath = "Palabras/tellamas.mp4";
+if (speechText.includes("hola")) {
+    videoPath = "Palabras/hola.mp4";
+} else if (speechText.includes("como estas") || speechText.includes("cómo estás")) {
+    videoPath = "Palabras/comoestas.mp4";
+} else if (speechText.includes("vos cómo te llamas") || speechText.includes("cómo te llamas")) {
+    videoPath = "Palabras/comotellamas.mp4";
+} else if (speechText.includes("me llamo luana")) {
+    videoPath = "Palabras/llamoluana.mp4";
 }
 
     // Si se detectó una palabra válida, actualizar el video y mostrarlo
