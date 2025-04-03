@@ -19,7 +19,6 @@ reconocimiento.onresult = (event) => {
     const speechText = event.results[0][0].transcript.toLowerCase();
     texto.textContent = speechText;
 
-    let videoPath = "";
 
     // Asignamos el video según la palabra detectada
 if (speechText.includes("hola")) {
@@ -30,6 +29,8 @@ if (speechText.includes("hola")) {
     videoPath = "Palabras/comotellamas.mp4";
 } else if (speechText.includes("me llamo luana")) {
     videoPath = "Palabras/llamoluana.mp4";
+} else if (speechText.includes("letra a")) {
+    videoPath = "Palabras/letraA.mp4";
 }
 
     // Si se detectó una palabra válida, actualizar el video y mostrarlo
