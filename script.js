@@ -4,10 +4,9 @@ const texto = document.getElementById('texto');
 const videoSeña = document.getElementById('videoSeña');
 const videoSource = document.getElementById('videoSource');
 const entradaTexto = document.getElementById('entradaTexto');
-const botonTexto = document.getElementById('botonTexto');
 
 // Ocultar el video al cargar la página
-videoSeña.style.display = "none"; 
+videoSeña.style.display = "none";
 
 // Configuramos el reconocimiento de voz
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -17,37 +16,46 @@ boton.addEventListener('click', () => {
     reconocimiento.start(); // Inicia el reconocimiento de voz
 });
 
-// Función para procesar texto y mostrar video
-function procesarTexto(speechText) {
-    let videoPath = "";
-    speechText = speechText.toLowerCase().trim();
+reconocimiento.onresult = (event) => {
+    const speechText = event.results[0][0].transcript.toLowerCase();
+    texto.textContent = speechText;
+    reproducirVideoSegunTexto(speechText);
+};
 
-    // Palabras completas
-    if (speechText.includes("hola")) {
+// Escuchar cuando presionan Enter en el campo de texto
+entradaTexto.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const userInput = entradaTexto.value.toLowerCase();
+        texto.textContent = userInput;
+        reproducirVideoSegunTexto(userInput);
+    }
+});
+
+// Función para reproducir video según palabra
+function reproducirVideoSegunTexto(text) {
+    let videoPath = "";
+
+    // Palabras específicas
+    if (text.includes("hola")) {
         videoPath = "Palabras/hola.mp4";
-    } else if (speechText.includes("como estas") || speechText.includes("cómo estás")) {
+    } else if (text.includes("como estas") || text.includes("cómo estás")) {
         videoPath = "Palabras/comoestas.mp4";
-    } else if (speechText.includes("vos cómo te llamas") || speechText.includes("cómo te llamas")) {
+    } else if (text.includes("vos cómo te llamas") || text.includes("cómo te llamas")) {
         videoPath = "Palabras/comotellamas.mp4";
-    } else if (speechText.includes("me llamo luana")) {
+    } else if (text.includes("me llamo luana")) {
         videoPath = "Palabras/llamoluana.mp4";
     }
 
-    // Letras sueltas y "letra + letra"
-    const letras = [
-        "a","b","c","ch","d","e","f","g","h","i","j","k","l","ll","m","n","ñ",
-        "o","p","q","r","s","t","u","v","w","x","y","z"
-    ];
-
-    for (let letra of letras) {
-        if (speechText === letra || speechText === `letra ${letra}`) {
-            const letraMayus = letra.toUpperCase(); // Para nombre de archivo
-            videoPath = `Palabras/letra${letraMayus}.mp4`;
-            break;
+    // Letras del abecedario (incluyendo LL y CH)
+    const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
+    
+    letras.forEach(letra => {
+        if (text === letra || text === `letra ${letra}`) {
+            videoPath = `Palabras/letra${letra.toUpperCase()}.mp4`;
         }
-    }
+    });
 
-    // Mostrar video si hay coincidencia
     if (videoPath) {
         videoSource.src = videoPath;
         videoSeña.load();
@@ -57,17 +65,3 @@ function procesarTexto(speechText) {
         videoSeña.style.display = "none";
     }
 }
-
-// Cuando se detecta la voz
-reconocimiento.onresult = (event) => {
-    const speechText = event.results[0][0].transcript;
-    texto.textContent = speechText;
-    procesarTexto(speechText);
-};
-
-// Cuando se presiona el botón de texto
-botonTexto.addEventListener('click', () => {
-    const textoEscrito = entradaTexto.value.trim();
-    texto.textContent = textoEscrito;
-    procesarTexto(textoEscrito);
-});
