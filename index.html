@@ -2,22 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Traductor a Señas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traductor de Voz y Texto a Lengua de Señas</title>
+    <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-    <h1>Traductor a Lengua de Señas</h1>
+
+    <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
 
     <button id="start">Hablar</button>
-    <input type="text" id="entradaTexto" placeholder="Escribe aquí...">
-    <button id="botonTexto">Traducir texto</button>
 
+    <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
     <p id="texto"></p>
 
     <video id="videoSeña" width="320" height="240" controls>
         <source id="videoSource" src="" type="video/mp4">
-        Tu navegador no soporta videos.
+        Tu navegador no soporta la reproducción de videos.
     </video>
 
-    <script src="tuarchivo.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
