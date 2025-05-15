@@ -32,11 +32,16 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Función para reproducir video según palabra
+// Funciones para verbos y palabras
+function contienePalabra(text, base) {
+    const regex = new RegExp("\\b" + base + "(\u00e1|\u00e9|\u00ed|\u00f3|\u00fa|\\w)*\\b", 'i');
+    return regex.test(text);
+}
+
 function reproducirVideoSegunTexto(text) {
     let videoPath = "";
 
-    // Palabras específicas
+    // Palabras fijas
     if (text.includes("hola")) {
         videoPath = "Palabras/hola.mp4";
     } else if (text.includes("como estas") || text.includes("cómo estás")) {
@@ -47,14 +52,43 @@ function reproducirVideoSegunTexto(text) {
         videoPath = "Palabras/llamoluana.mp4";
     }
 
-    // Letras del abecedario (incluyendo LL y CH)
+    // Abecedario completo
     const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-    
     letras.forEach(letra => {
         if (text === letra || text === `letra ${letra}`) {
             videoPath = `Palabras/letra${letra.toUpperCase()}.mp4`;
         }
     });
+
+    // Verbos y palabras que deben detectarse en cualquier forma
+    const palabrasFlexibles = {
+        dialogar: "Dialogar",
+        hablar: "Hablar",
+        "lengua oral": "Lengua oral",
+        decir: "Decir",
+        contar: "Contar o Narrar",
+        narrar: "Contar o Narrar",
+        explicar: "Explicar",
+        si: "Si",
+        no: "No",
+        negar: "Negar",
+        también: "Tambien",
+        tampoco: "Tampoco",
+        estar: "Estar",
+        yo: "Yo",
+        vos: "Vos",
+        ustedes: "Ustedes",
+        "el": "El o Ella",
+        "ella": "El o Ella",
+        "nosotros": "Nosotros o Nosotras",
+        "nosotras": "Nosotros o Nosotras"
+    };
+
+    for (let clave in palabrasFlexibles) {
+        if (contienePalabra(text, clave)) {
+            videoPath = `Palabras/${palabrasFlexibles[clave]}.mp4`;
+        }
+    }
 
     if (videoPath) {
         videoSource.src = videoPath;
