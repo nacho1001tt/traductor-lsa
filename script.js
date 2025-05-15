@@ -32,35 +32,16 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Diccionario de palabras clave para cada video
-const palabrasClave = {
-    "Palabras/Dialogar.mp4": ["dialogar", "dialogo", "dialogamos", "dialogan", "dialogando", "dialogué"],
-    "Palabras/Hablar.mp4": ["hablar", "hablo", "hablamos", "hablan", "hablando", "hablé", "hablado"],
-    "Palabras/Lengua oral.mp4": ["lengua oral"],
-    "Palabras/Decir.mp4": ["decir", "digo", "dices", "dice", "decimos", "dicen", "dije", "dicho", "diciendo"],
-    "Palabras/Contar o Narrar.mp4": ["contar", "narrar", "cuento", "contamos", "contando", "narramos", "narrando", "narré"],
-    "Palabras/Explicar.mp4": ["explicar", "explico", "explicas", "explicamos", "explicando", "expliqué"],
-    "Palabras/Si.mp4": ["si"],
-    "Palabras/No.mp4": ["no"],
-    "Palabras/Negar.mp4": ["negar", "nego", "negamos", "negando", "negué"],
-    "Palabras/Tambien.mp4": ["tambien", "también"],
-    "Palabras/Tampoco.mp4": ["tampoco"],
-    "Palabras/Estar.mp4": ["estar", "estoy", "estás", "está", "estamos", "están", "estuve", "estado", "estando"],
-    "Palabras/Yo.mp4": ["yo"],
-    "Palabras/Vos.mp4": ["vos"],
-    "Palabras/Ustedes.mp4": ["ustedes"],
-    "Palabras/El o Ella.mp4": ["el", "ella"],
-    "Palabras/Nosotros o Nosotras.mp4": ["nosotros", "nosotras"]
-};
+// Funciones para verbos y palabras
+function contienePalabra(text, base) {
+    const regex = new RegExp("\\b" + base + "(\u00e1|\u00e9|\u00ed|\u00f3|\u00fa|\\w)*\\b", 'i');
+    return regex.test(text);
+}
 
-// Letras del abecedario (incluyendo LL y CH)
-const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-
-// Función principal para reproducir video según palabra
 function reproducirVideoSegunTexto(text) {
     let videoPath = "";
 
-    // Palabras específicas
+    // Palabras fijas
     if (text.includes("hola")) {
         videoPath = "Palabras/hola.mp4";
     } else if (text.includes("como estas") || text.includes("cómo estás")) {
@@ -71,22 +52,44 @@ function reproducirVideoSegunTexto(text) {
         videoPath = "Palabras/llamoluana.mp4";
     }
 
-    // Letras individuales
+    // Abecedario completo
+    const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
     letras.forEach(letra => {
         if (text === letra || text === `letra ${letra}`) {
             videoPath = `Palabras/letra${letra.toUpperCase()}.mp4`;
         }
     });
 
-    // Palabras del diccionario
-    for (const [ruta, variaciones] of Object.entries(palabrasClave)) {
-        if (variaciones.some(forma => text.includes(forma))) {
-            videoPath = ruta;
-            break;
+    // Verbos y palabras que deben detectarse en cualquier forma
+    const palabrasFlexibles = {
+        dialogar: "Dialogar",
+        hablar: "Hablar",
+        "lengua oral": "Lengua oral",
+        decir: "Decir",
+        contar: "Contar o Narrar",
+        narrar: "Contar o Narrar",
+        explicar: "Explicar",
+        si: "Si",
+        no: "No",
+        negar: "Negar",
+        también: "Tambien",
+        tampoco: "Tampoco",
+        estar: "Estar",
+        yo: "Yo",
+        vos: "Vos",
+        ustedes: "Ustedes",
+        "el": "El o Ella",
+        "ella": "El o Ella",
+        "nosotros": "Nosotros o Nosotras",
+        "nosotras": "Nosotros o Nosotras"
+    };
+
+    for (let clave in palabrasFlexibles) {
+        if (contienePalabra(text, clave)) {
+            videoPath = `Palabras/${palabrasFlexibles[clave]}.mp4`;
         }
     }
 
-    // Reproducir video si se detectó alguna coincidencia
     if (videoPath) {
         videoSource.src = videoPath;
         videoSeña.load();
