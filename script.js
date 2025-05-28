@@ -32,9 +32,9 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Funciones para verbos y palabras
+// Función mejorada para detectar palabras base con conjugaciones verbales comunes
 function contienePalabra(text, base) {
-    const regex = new RegExp("\\b" + base + "(\u00e1|\u00e9|\u00ed|\u00f3|\u00fa|\\w)*\\b", 'i');
+    const regex = new RegExp(`\\b${base}(ar|o|as|a|amos|áis|an|é|aste|ó|aron|aba|abas|ábamos|aban|aré|arás|ará|aremos|arán)?\\b`, 'i');
     return regex.test(text);
 }
 
@@ -60,7 +60,7 @@ function reproducirVideoSegunTexto(text) {
         }
     });
 
-    // Verbos y palabras que deben detectarse en cualquier forma
+    // Palabras con conjugaciones o sinónimos
     const palabrasFlexibles = {
         dialogar: "Dialogar",
         hablar: "Hablar",
