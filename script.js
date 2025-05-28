@@ -32,16 +32,90 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Función mejorada para detectar palabras base con conjugaciones verbales comunes
-function contienePalabra(text, base) {
-    const regex = new RegExp(`\\b${base}(ar|o|as|a|amos|áis|an|é|aste|ó|aron|aba|abas|ábamos|aban|aré|arás|ará|aremos|arán)?\\b`, 'i');
-    return regex.test(text);
+// Lista de conjugaciones por palabra clave
+const conjugaciones = {
+    dialogar: [
+        "dialogo", "dialogas", "dialoga", "dialogamos", "dialogan",
+        "dialogué", "dialogaste", "dialogó", "dialogamos", "dialogaron",
+        "dialogaba", "dialogabas", "dialogábamos", "dialogaban",
+        "dialogaré", "dialogarás", "dialogará", "dialogaremos", "dialogarán",
+        "dialogaría", "dialogarías", "dialogaríamos", "dialogarían",
+        "dialogando", "dialogado"
+    ],
+    hablar: [
+        "hablo", "hablas", "habla", "hablamos", "hablan",
+        "hablé", "hablaste", "habló", "hablamos", "hablaron",
+        "hablaba", "hablabas", "hablábamos", "hablaban",
+        "hablaré", "hablarás", "hablará", "hablaremos", "hablarán",
+        "hablaría", "hablarías", "hablaríamos", "hablarían",
+        "hablando", "hablado"
+    ],
+    decir: [
+        "digo", "dices", "dice", "decimos", "dicen",
+        "dije", "dijiste", "dijo", "dijimos", "dijeron",
+        "decía", "decías", "decíamos", "decían",
+        "diré", "dirás", "dirá", "diremos", "dirán",
+        "diría", "dirías", "diríamos", "dirían",
+        "diciendo", "dicho"
+    ],
+    contar: [
+        "cuento", "cuentas", "cuenta", "contamos", "cuentan",
+        "conté", "contaste", "contó", "contamos", "contaron",
+        "contaba", "contabas", "contábamos", "contaban",
+        "contaré", "contarás", "contará", "contaremos", "contarán",
+        "contaría", "contarías", "contaríamos", "contarían",
+        "contando", "contado"
+    ],
+    narrar: [
+        "narro", "narras", "narra", "narramos", "narran",
+        "narré", "narraste", "narró", "narramos", "narraron",
+        "narraba", "narrabas", "narrábamos", "narraban",
+        "narraré", "narrarás", "narrará", "narraremos", "narrarán",
+        "narrando", "narrado"
+    ],
+    explicar: [
+        "explico", "explicas", "explica", "explicamos", "explican",
+        "expliqué", "explicaste", "explicó", "explicamos", "explicaron",
+        "explicaba", "explicabas", "explicábamos", "explicaban",
+        "explicaré", "explicarás", "explicará", "explicaremos", "explicarán",
+        "explicando", "explicado"
+    ],
+    estar: [
+        "estoy", "estás", "está", "estamos", "están",
+        "estuve", "estuviste", "estuvo", "estuvimos", "estuvieron",
+        "estaba", "estabas", "estábamos", "estaban",
+        "estaré", "estarás", "estará", "estaremos", "estarán",
+        "estando", "estado"
+    ]
+};
+
+// Palabras base sin conjugaciones
+const palabrasFijas = {
+    "lengua oral": "Lengua oral",
+    si: "Si",
+    no: "No",
+    negar: "Negar",
+    también: "Tambien",
+    tampoco: "Tampoco",
+    yo: "Yo",
+    vos: "Vos",
+    ustedes: "Ustedes",
+    "el": "El o Ella",
+    "ella": "El o Ella",
+    "nosotros": "Nosotros o Nosotras",
+    "nosotras": "Nosotros o Nosotras"
+};
+
+// Función que busca coincidencia en conjugaciones
+function contieneConjugacion(texto, verbo) {
+    const formas = conjugaciones[verbo];
+    return formas.some(f => texto.includes(f));
 }
 
 function reproducirVideoSegunTexto(text) {
     let videoPath = "";
 
-    // Palabras fijas
+    // Frases fijas
     if (text.includes("hola")) {
         videoPath = "Palabras/hola.mp4";
     } else if (text.includes("como estas") || text.includes("cómo estás")) {
@@ -52,7 +126,7 @@ function reproducirVideoSegunTexto(text) {
         videoPath = "Palabras/llamoluana.mp4";
     }
 
-    // Abecedario completo
+    // Letras del abecedario
     const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
     letras.forEach(letra => {
         if (text === letra || text === `letra ${letra}`) {
@@ -60,36 +134,22 @@ function reproducirVideoSegunTexto(text) {
         }
     });
 
-    // Palabras con conjugaciones o sinónimos
-    const palabrasFlexibles = {
-        dialogar: "Dialogar",
-        hablar: "Hablar",
-        "lengua oral": "Lengua oral",
-        decir: "Decir",
-        contar: "Contar o Narrar",
-        narrar: "Contar o Narrar",
-        explicar: "Explicar",
-        si: "Si",
-        no: "No",
-        negar: "Negar",
-        también: "Tambien",
-        tampoco: "Tampoco",
-        estar: "Estar",
-        yo: "Yo",
-        vos: "Vos",
-        ustedes: "Ustedes",
-        "el": "El o Ella",
-        "ella": "El o Ella",
-        "nosotros": "Nosotros o Nosotras",
-        "nosotras": "Nosotros o Nosotras"
-    };
-
-    for (let clave in palabrasFlexibles) {
-        if (contienePalabra(text, clave)) {
-            videoPath = `Palabras/${palabrasFlexibles[clave]}.mp4`;
+    // Buscar conjugaciones
+    for (let verbo in conjugaciones) {
+        if (contieneConjugacion(text, verbo)) {
+            const nombreArchivo = verbo === "contar" || verbo === "narrar" ? "Contar o Narrar" : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+            videoPath = `Palabras/${nombreArchivo}.mp4`;
         }
     }
 
+    // Palabras fijas sin conjugación
+    for (let palabra in palabrasFijas) {
+        if (text.includes(palabra)) {
+            videoPath = `Palabras/${palabrasFijas[palabra]}.mp4`;
+        }
+    }
+
+    // Reproducir video
     if (videoPath) {
         videoSource.src = videoPath;
         videoSeña.load();
