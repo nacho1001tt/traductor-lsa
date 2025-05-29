@@ -34,57 +34,57 @@ entradaTexto.addEventListener('keypress', (event) => {
 // Lista completa de conjugaciones por verbo
 const conjugaciones = {
     dialogar: [
-        "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
+        "dialogar", "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
         "dialogué", "dialogaste", "dialogó", "dialogamos", "dialogaron",
         "dialogaba", "dialogabas", "dialogábamos", "dialogaban",
         "dialogaré", "dialogarás", "dialogará", "dialogaremos", "dialogarán",
         "dialogaría", "dialogarías", "dialogaríamos", "dialogarían",
-        "dialogando", "dialogado"
+        "dialogando", "dialogado", "dialogaré", "he dialogado", "hemos dialogado", "han dialogado"
     ],
     hablar: [
-        "hablo", "hablás", "hablas", "habla", "hablamos", "hablan",
+        "hablar", "hablo", "hablás", "hablas", "habla", "hablamos", "hablan",
         "hablé", "hablaste", "habló", "hablamos", "hablaron",
         "hablaba", "hablabas", "hablábamos", "hablaban",
         "hablaré", "hablarás", "hablará", "hablaremos", "hablarán",
         "hablaría", "hablarías", "hablaríamos", "hablarían",
-        "hablando", "hablado"
+        "hablando", "hablado", "he hablado", "hemos hablado", "han hablado"
     ],
     decir: [
-        "digo", "decís", "dices", "dice", "decimos", "dicen",
+        "decir", "digo", "decís", "dices", "dice", "decimos", "dicen",
         "dije", "dijiste", "dijo", "dijimos", "dijeron",
         "decía", "decías", "decíamos", "decían",
         "diré", "dirás", "dirá", "diremos", "dirán",
         "diría", "dirías", "diríamos", "dirían",
-        "diciendo", "dicho"
+        "diciendo", "dicho", "he dicho", "hemos dicho", "han dicho"
     ],
     contar: [
-        "cuento", "contás", "contas", "cuenta", "contamos", "cuentan",
+        "contar", "cuento", "contás", "contas", "cuenta", "contamos", "cuentan",
         "conté", "contaste", "contó", "contamos", "contaron",
         "contaba", "contabas", "contábamos", "contaban",
         "contaré", "contarás", "contará", "contaremos", "contarán",
         "contaría", "contarías", "contaríamos", "contarían",
-        "contando", "contado"
+        "contando", "contado", "he contado", "hemos contado", "han contado"
     ],
     narrar: [
-        "narro", "narrás", "narras", "narra", "narramos", "narran",
+        "narrar", "narro", "narrás", "narras", "narra", "narramos", "narran",
         "narré", "narraste", "narró", "narramos", "narraron",
         "narraba", "narrabas", "narrábamos", "narraban",
         "narraré", "narrarás", "narrará", "narraremos", "narrarán",
-        "narrando", "narrado"
+        "narrando", "narrado", "he narrado", "hemos narrado", "han narrado"
     ],
     explicar: [
-        "explico", "explicás", "explicas", "explica", "explicamos", "explican",
+        "explicar", "explico", "explicás", "explicas", "explica", "explicamos", "explican",
         "expliqué", "explicaste", "explicó", "explicamos", "explicaron",
         "explicaba", "explicabas", "explicábamos", "explicaban",
         "explicaré", "explicarás", "explicará", "explicaremos", "explicarán",
-        "explicando", "explicado"
+        "explicando", "explicado", "he explicado", "hemos explicado", "han explicado"
     ],
     estar: [
-        "estoy", "estás", "está", "estamos", "están",
+        "estar", "estoy", "estás", "está", "estamos", "están",
         "estuve", "estuviste", "estuvo", "estuvimos", "estuvieron",
         "estaba", "estabas", "estábamos", "estaban",
         "estaré", "estarás", "estará", "estaremos", "estarán",
-        "estando", "estado"
+        "estando", "estado", "he estado", "hemos estado", "han estado"
     ]
 };
 
