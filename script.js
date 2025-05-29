@@ -8,18 +8,18 @@ const entradaTexto = document.getElementById('entradaTexto');
 // Ocultar el video al cargar la página
 videoSeña.style.display = "none";
 
-// Configuración del reconocimiento de voz
+// Configuramos el reconocimiento de voz
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-reconocimiento.lang = 'es-ES';
+reconocimiento.lang = 'es-ES'; // Idioma español
 
 boton.addEventListener('click', () => {
-    reconocimiento.start();
+    reconocimiento.start(); // Inicia el reconocimiento de voz
 });
 
 reconocimiento.onresult = (event) => {
     const speechText = event.results[0][0].transcript.toLowerCase();
     texto.textContent = speechText;
-    reproducirVideoSegunTexto(speechText);
+    procesarTextoSecuencial(speechText);
 };
 
 entradaTexto.addEventListener('keypress', (event) => {
@@ -27,7 +27,7 @@ entradaTexto.addEventListener('keypress', (event) => {
         event.preventDefault();
         const userInput = entradaTexto.value.toLowerCase();
         texto.textContent = userInput;
-        reproducirVideoSegunTexto(userInput);
+        procesarTextoSecuencial(userInput);
     }
 });
 
@@ -99,97 +99,83 @@ const palabrasFijas = {
     yo: "Yo",
     vos: "Vos",
     ustedes: "Ustedes",
-    el: "El o Ella",
-    ella: "El o Ella",
-    nosotros: "Nosotros o Nosotras",
-    nosotras: "Nosotros o Nosotras"
+    "el": "El o Ella",
+    "ella": "El o Ella",
+    "nosotros": "Nosotros o Nosotras",
+    "nosotras": "Nosotros o Nosotras"
 };
 
-// Letras del abecedario
-const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-
-// Función principal
-function reproducirVideoSegunTexto(text) {
-    const palabras = text.split(/[\s,;?.!¡¿]+/).filter(Boolean);
-    const videoPaths = [];
+// Estructura secuencial con delay de 100ms
+function procesarTextoSecuencial(text) {
+    const palabras = text.split(" ");
+    const videosAReproducir = [];
 
     for (let palabra of palabras) {
-        palabra = palabra.toLowerCase();
+        palabra = palabra.trim();
 
-        // Frases completas
+        // Frases fijas
         if (palabra === "hola") {
-            videoPaths.push("Palabras/hola.mp4");
+            videosAReproducir.push("Palabras/hola.mp4");
             continue;
         }
-        if (palabra === "comoestas" || palabra === "cómoestás" || palabra === "como" || palabra === "estás") {
-            videoPaths.push("Palabras/comoestas.mp4");
+        if (text.includes("como estas") || text.includes("cómo estás")) {
+            videosAReproducir.push("Palabras/comoestas.mp4");
             continue;
         }
-        if (palabra === "comotellamas" || palabra === "llamas") {
-            videoPaths.push("Palabras/comotellamas.mp4");
+        if (text.includes("vos cómo te llamas") || text.includes("cómo te llamas")) {
+            videosAReproducir.push("Palabras/comotellamas.mp4");
             continue;
         }
-        if (palabra === "luana" || palabra === "llamoluana") {
-            videoPaths.push("Palabras/llamoluana.mp4");
+        if (text.includes("me llamo luana")) {
+            videosAReproducir.push("Palabras/llamoluana.mp4");
             continue;
         }
 
         // Letras
+        const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
         if (letras.includes(palabra)) {
-            videoPaths.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
+            videosAReproducir.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
             continue;
         }
 
-        // Conjugaciones
-        let detectado = false;
+        // Verbo conjugado
         for (let verbo in conjugaciones) {
             if (conjugaciones[verbo].includes(palabra)) {
-                const nombreArchivo = (verbo === "contar" || verbo === "narrar") ? "Contar o Narrar" : verbo.charAt(0).toUpperCase() + verbo.slice(1);
-                videoPaths.push(`Palabras/${nombreArchivo}.mp4`);
-                detectado = true;
+                const nombreArchivo = (verbo === "contar" || verbo === "narrar")
+                    ? "Contar o Narrar"
+                    : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+                videosAReproducir.push(`Palabras/${nombreArchivo}.mp4`);
                 break;
             }
         }
-        if (detectado) continue;
 
-        // Palabras fijas
-        for (let clave in palabrasFijas) {
-            if (palabra === clave) {
-                videoPaths.push(`Palabras/${palabrasFijas[clave]}.mp4`);
+        // Palabras fijas sueltas
+        for (let fija in palabrasFijas) {
+            if (palabra === fija) {
+                videosAReproducir.push(`Palabras/${palabrasFijas[fija]}.mp4`);
                 break;
             }
         }
     }
 
-    if (videoPaths.length > 0) {
-        reproducirVideosEnCadena(videoPaths);
-    } else {
-        videoSeña.style.display = "none";
-    }
+    reproducirSecuencialmente(videosAReproducir);
 }
 
-// Función para reproducir los videos uno tras otro con delay
-function reproducirVideosEnCadena(videoPaths) {
-    let index = 0;
-
-    function reproducirSiguiente() {
-        if (index >= videoPaths.length) {
-            videoSeña.style.display = "none";
-            return;
-        }
-
-        videoSource.src = videoPaths[index];
-        videoSeña.load();
-        videoSeña.style.display = "block";
-        videoSeña.play();
-
-        videoSeña.onended = () => {
-            setTimeout(() => {
-                index++;
-                reproducirSiguiente();
-            }, 200);
-        };
+// Reproduce los videos uno tras otro con delay de 100ms
+function reproducirSecuencialmente(lista) {
+    if (lista.length === 0) {
+        videoSeña.style.display = "none";
+        return;
     }
 
-    reproducirSiguiente();
+    const path = lista.shift();
+    videoSource.src = path;
+    videoSeña.load();
+    videoSeña.style.display = "block";
+    videoSeña.onended = () => {
+        setTimeout(() => {
+            reproducirSecuencialmente(lista);
+        }, 100); // delay de 100ms
+    };
+    videoSeña.play();
 }
