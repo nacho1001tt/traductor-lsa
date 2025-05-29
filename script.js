@@ -31,64 +31,18 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Lista completa de conjugaciones por verbo
+// Conjugaciones de verbos comunes
 const conjugaciones = {
-    dialogar: [
-        "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
-        "dialogué", "dialogaste", "dialogó", "dialogamos", "dialogaron",
-        "dialogaba", "dialogabas", "dialogábamos", "dialogaban",
-        "dialogaré", "dialogarás", "dialogará", "dialogaremos", "dialogarán",
-        "dialogaría", "dialogarías", "dialogaríamos", "dialogarían",
-        "dialogando", "dialogado"
-    ],
-    hablar: [
-        "hablo", "hablás", "hablas", "habla", "hablamos", "hablan",
-        "hablé", "hablaste", "habló", "hablamos", "hablaron",
-        "hablaba", "hablabas", "hablábamos", "hablaban",
-        "hablaré", "hablarás", "hablará", "hablaremos", "hablarán",
-        "hablaría", "hablarías", "hablaríamos", "hablarían",
-        "hablando", "hablado"
-    ],
-    decir: [
-        "digo", "decís", "dices", "dice", "decimos", "dicen",
-        "dije", "dijiste", "dijo", "dijimos", "dijeron",
-        "decía", "decías", "decíamos", "decían",
-        "diré", "dirás", "dirá", "diremos", "dirán",
-        "diría", "dirías", "diríamos", "dirían",
-        "diciendo", "dicho"
-    ],
-    contar: [
-        "cuento", "contás", "contas", "cuenta", "contamos", "cuentan",
-        "conté", "contaste", "contó", "contamos", "contaron",
-        "contaba", "contabas", "contábamos", "contaban",
-        "contaré", "contarás", "contará", "contaremos", "contarán",
-        "contaría", "contarías", "contaríamos", "contarían",
-        "contando", "contado"
-    ],
-    narrar: [
-        "narro", "narrás", "narras", "narra", "narramos", "narran",
-        "narré", "narraste", "narró", "narramos", "narraron",
-        "narraba", "narrabas", "narrábamos", "narraban",
-        "narraré", "narrarás", "narrará", "narraremos", "narrarán",
-        "narrando", "narrado"
-    ],
-    explicar: [
-        "explico", "explicás", "explicas", "explica", "explicamos", "explican",
-        "expliqué", "explicaste", "explicó", "explicamos", "explicaron",
-        "explicaba", "explicabas", "explicábamos", "explicaban",
-        "explicaré", "explicarás", "explicará", "explicaremos", "explicarán",
-        "explicando", "explicado"
-    ],
-    estar: [
-        "estoy", "estás", "está", "estamos", "están",
-        "estuve", "estuviste", "estuvo", "estuvimos", "estuvieron",
-        "estaba", "estabas", "estábamos", "estaban",
-        "estaré", "estarás", "estará", "estaremos", "estarán",
-        "estando", "estado"
-    ]
+    dialogar: ["dialogo", "dialogás", "dialoga", "dialogamos", "dialogan", "dialogando", "dialogado", "dialogué"],
+    hablar: ["hablo", "hablás", "habla", "hablamos", "hablan", "hablando", "hablado", "hablé"],
+    decir: ["digo", "decís", "dice", "decimos", "dicen", "diciendo", "dicho", "dije"],
+    contar: ["cuento", "contás", "cuenta", "contamos", "cuentan", "contando", "contado", "conté"],
+    narrar: ["narro", "narrás", "narra", "narramos", "narran", "narrando", "narrado", "narré"],
+    explicar: ["explico", "explicás", "explica", "explicamos", "explican", "explicando", "explicado", "expliqué"],
+    estar: ["estoy", "estás", "está", "estamos", "están", "estando", "estado", "estuve"]
 };
 
-// Palabras fijas sin conjugación
+// Palabras fijas con sus nombres de archivo
 const palabrasFijas = {
     "lengua oral": "Lengua oral",
     si: "Si",
@@ -105,73 +59,104 @@ const palabrasFijas = {
     "nosotras": "Nosotros o Nosotras"
 };
 
-// Función principal que selecciona el video según texto
+// Letras del abecedario
+const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
+
+// Función principal que arma la lista de videos
 function reproducirVideoSegunTexto(text) {
-    let videoPath = "";
+    const partes = text.split(/[,.;?!¿¡\s]+/).filter(Boolean);
+    const videoPaths = [];
 
-    // Frases fijas (tienen prioridad)
-    if (text.includes("hola")) {
-        videoPath = "Palabras/hola.mp4";
-        mostrarVideo(videoPath);
-        return;
-    }
-    if (text.includes("como estas") || text.includes("cómo estás")) {
-        videoPath = "Palabras/comoestas.mp4";
-        mostrarVideo(videoPath);
-        return;
-    }
-    if (text.includes("vos cómo te llamas") || text.includes("cómo te llamas")) {
-        videoPath = "Palabras/comotellamas.mp4";
-        mostrarVideo(videoPath);
-        return;
-    }
-    if (text.includes("me llamo luana")) {
-        videoPath = "Palabras/llamoluana.mp4";
-        mostrarVideo(videoPath);
+    // Frases completas especiales
+    const frase = text.toLowerCase();
+    if (frase.includes("hola, buen dia, cómo estas") || frase.includes("hola buen dia cómo estás")) {
+        videoPaths.push("Palabras/hola.mp4", "Palabras/buendia.mp4", "Palabras/comoestas.mp4");
+        reproducirVideosEnCadena(videoPaths);
         return;
     }
 
-    // Letras del abecedario
-    const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-    for (let letra of letras) {
-        if (text === letra || text === `letra ${letra}`) {
-            videoPath = `Palabras/letra${letra.toUpperCase()}.mp4`;
-            mostrarVideo(videoPath);
-            return;
+    for (let palabra of partes) {
+        palabra = palabra.toLowerCase();
+
+        // Frases fijas
+        if (palabra === "hola") {
+            videoPaths.push("Palabras/hola.mp4");
+            continue;
         }
-    }
+        if (palabra === "comoestas" || palabra === "cómoestás" || palabra === "como" || palabra === "estás") {
+            videoPaths.push("Palabras/comoestas.mp4");
+            continue;
+        }
+        if (palabra === "comotellamas" || palabra === "llamas") {
+            videoPaths.push("Palabras/comotellamas.mp4");
+            continue;
+        }
+        if (palabra === "luana" || palabra === "llamoluana") {
+            videoPaths.push("Palabras/llamoluana.mp4");
+            continue;
+        }
 
-    // Verificar todas las conjugaciones posibles
-    for (let verbo in conjugaciones) {
-        for (let forma of conjugaciones[verbo]) {
-            if (text.includes(forma)) {
-                const nombreArchivo = (verbo === "contar" || verbo === "narrar")
-                    ? "Contar o Narrar"
-                    : verbo.charAt(0).toUpperCase() + verbo.slice(1);
-                videoPath = `Palabras/${nombreArchivo}.mp4`;
-                mostrarVideo(videoPath);
-                return;
+        // Letras
+        if (letras.includes(palabra)) {
+            videoPaths.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
+            continue;
+        }
+
+        // Conjugaciones
+        let encontrado = false;
+        for (let verbo in conjugaciones) {
+            for (let forma of conjugaciones[verbo]) {
+                if (palabra === forma) {
+                    const nombreArchivo = (verbo === "contar" || verbo === "narrar")
+                        ? "Contar o Narrar"
+                        : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+                    videoPaths.push(`Palabras/${nombreArchivo}.mp4`);
+                    encontrado = true;
+                    break;
+                }
+            }
+            if (encontrado) break;
+        }
+        if (encontrado) continue;
+
+        // Palabras fijas
+        for (let palabraFija in palabrasFijas) {
+            if (palabra === palabraFija) {
+                videoPaths.push(`Palabras/${palabrasFijas[palabraFija]}.mp4`);
+                break;
             }
         }
     }
 
-    // Palabras sueltas fijas
-    for (let palabra in palabrasFijas) {
-        if (text.includes(palabra)) {
-            videoPath = `Palabras/${palabrasFijas[palabra]}.mp4`;
-            mostrarVideo(videoPath);
-            return;
-        }
+    if (videoPaths.length > 0) {
+        reproducirVideosEnCadena(videoPaths);
+    } else {
+        videoSeña.style.display = "none";
     }
-
-    // Si no encontró nada
-    videoSeña.style.display = "none";
 }
 
-// Carga y reproduce el video
-function mostrarVideo(path) {
-    videoSource.src = path;
-    videoSeña.load();
-    videoSeña.style.display = "block";
-    videoSeña.play();
+// Función que reproduce una lista de videos uno tras otro, con delay de 200 ms entre ellos
+function reproducirVideosEnCadena(videoPaths) {
+    let index = 0;
+
+    function reproducirSiguiente() {
+        if (index >= videoPaths.length) {
+            videoSeña.style.display = "none";
+            return;
+        }
+
+        videoSource.src = videoPaths[index];
+        videoSeña.load();
+        videoSeña.style.display = "block";
+        videoSeña.play();
+
+        videoSeña.onended = () => {
+            setTimeout(() => {
+                index++;
+                reproducirSiguiente();
+            }, 200); // Delay de 200ms
+        };
+    }
+
+    reproducirSiguiente();
 }
