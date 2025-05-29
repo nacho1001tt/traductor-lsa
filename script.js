@@ -8,12 +8,12 @@ const entradaTexto = document.getElementById('entradaTexto');
 // Ocultar el video al cargar la página
 videoSeña.style.display = "none";
 
-// Configuramos el reconocimiento de voz
+// Configuración del reconocimiento de voz
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-reconocimiento.lang = 'es-ES'; // Idioma español
+reconocimiento.lang = 'es-ES';
 
 boton.addEventListener('click', () => {
-    reconocimiento.start(); // Inicia el reconocimiento de voz
+    reconocimiento.start();
 });
 
 reconocimiento.onresult = (event) => {
@@ -31,18 +31,64 @@ entradaTexto.addEventListener('keypress', (event) => {
     }
 });
 
-// Conjugaciones de verbos comunes
+// Lista completa de conjugaciones por verbo
 const conjugaciones = {
-    dialogar: ["dialogo", "dialogás", "dialoga", "dialogamos", "dialogan", "dialogando", "dialogado", "dialogué"],
-    hablar: ["hablo", "hablás", "habla", "hablamos", "hablan", "hablando", "hablado", "hablé"],
-    decir: ["digo", "decís", "dice", "decimos", "dicen", "diciendo", "dicho", "dije"],
-    contar: ["cuento", "contás", "cuenta", "contamos", "cuentan", "contando", "contado", "conté"],
-    narrar: ["narro", "narrás", "narra", "narramos", "narran", "narrando", "narrado", "narré"],
-    explicar: ["explico", "explicás", "explica", "explicamos", "explican", "explicando", "explicado", "expliqué"],
-    estar: ["estoy", "estás", "está", "estamos", "están", "estando", "estado", "estuve"]
+    dialogar: [
+        "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
+        "dialogué", "dialogaste", "dialogó", "dialogamos", "dialogaron",
+        "dialogaba", "dialogabas", "dialogábamos", "dialogaban",
+        "dialogaré", "dialogarás", "dialogará", "dialogaremos", "dialogarán",
+        "dialogaría", "dialogarías", "dialogaríamos", "dialogarían",
+        "dialogando", "dialogado"
+    ],
+    hablar: [
+        "hablo", "hablás", "hablas", "habla", "hablamos", "hablan",
+        "hablé", "hablaste", "habló", "hablamos", "hablaron",
+        "hablaba", "hablabas", "hablábamos", "hablaban",
+        "hablaré", "hablarás", "hablará", "hablaremos", "hablarán",
+        "hablaría", "hablarías", "hablaríamos", "hablarían",
+        "hablando", "hablado"
+    ],
+    decir: [
+        "digo", "decís", "dices", "dice", "decimos", "dicen",
+        "dije", "dijiste", "dijo", "dijimos", "dijeron",
+        "decía", "decías", "decíamos", "decían",
+        "diré", "dirás", "dirá", "diremos", "dirán",
+        "diría", "dirías", "diríamos", "dirían",
+        "diciendo", "dicho"
+    ],
+    contar: [
+        "cuento", "contás", "contas", "cuenta", "contamos", "cuentan",
+        "conté", "contaste", "contó", "contamos", "contaron",
+        "contaba", "contabas", "contábamos", "contaban",
+        "contaré", "contarás", "contará", "contaremos", "contarán",
+        "contaría", "contarías", "contaríamos", "contarían",
+        "contando", "contado"
+    ],
+    narrar: [
+        "narro", "narrás", "narras", "narra", "narramos", "narran",
+        "narré", "narraste", "narró", "narramos", "narraron",
+        "narraba", "narrabas", "narrábamos", "narraban",
+        "narraré", "narrarás", "narrará", "narraremos", "narrarán",
+        "narrando", "narrado"
+    ],
+    explicar: [
+        "explico", "explicás", "explicas", "explica", "explicamos", "explican",
+        "expliqué", "explicaste", "explicó", "explicamos", "explicaron",
+        "explicaba", "explicabas", "explicábamos", "explicaban",
+        "explicaré", "explicarás", "explicará", "explicaremos", "explicarán",
+        "explicando", "explicado"
+    ],
+    estar: [
+        "estoy", "estás", "está", "estamos", "están",
+        "estuve", "estuviste", "estuvo", "estuvimos", "estuvieron",
+        "estaba", "estabas", "estábamos", "estaban",
+        "estaré", "estarás", "estará", "estaremos", "estarán",
+        "estando", "estado"
+    ]
 };
 
-// Palabras fijas con sus nombres de archivo
+// Palabras fijas sin conjugación
 const palabrasFijas = {
     "lengua oral": "Lengua oral",
     si: "Si",
@@ -53,32 +99,24 @@ const palabrasFijas = {
     yo: "Yo",
     vos: "Vos",
     ustedes: "Ustedes",
-    "el": "El o Ella",
-    "ella": "El o Ella",
-    "nosotros": "Nosotros o Nosotras",
-    "nosotras": "Nosotros o Nosotras"
+    el: "El o Ella",
+    ella: "El o Ella",
+    nosotros: "Nosotros o Nosotras",
+    nosotras: "Nosotros o Nosotras"
 };
 
 // Letras del abecedario
 const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
 
-// Función principal que arma la lista de videos
+// Función principal
 function reproducirVideoSegunTexto(text) {
-    const partes = text.split(/[,.;?!¿¡\s]+/).filter(Boolean);
+    const palabras = text.split(/[\s,;?.!¡¿]+/).filter(Boolean);
     const videoPaths = [];
 
-    // Frases completas especiales
-    const frase = text.toLowerCase();
-    if (frase.includes("hola, buen dia, cómo estas") || frase.includes("hola buen dia cómo estás")) {
-        videoPaths.push("Palabras/hola.mp4", "Palabras/buendia.mp4", "Palabras/comoestas.mp4");
-        reproducirVideosEnCadena(videoPaths);
-        return;
-    }
-
-    for (let palabra of partes) {
+    for (let palabra of palabras) {
         palabra = palabra.toLowerCase();
 
-        // Frases fijas
+        // Frases completas
         if (palabra === "hola") {
             videoPaths.push("Palabras/hola.mp4");
             continue;
@@ -103,26 +141,21 @@ function reproducirVideoSegunTexto(text) {
         }
 
         // Conjugaciones
-        let encontrado = false;
+        let detectado = false;
         for (let verbo in conjugaciones) {
-            for (let forma of conjugaciones[verbo]) {
-                if (palabra === forma) {
-                    const nombreArchivo = (verbo === "contar" || verbo === "narrar")
-                        ? "Contar o Narrar"
-                        : verbo.charAt(0).toUpperCase() + verbo.slice(1);
-                    videoPaths.push(`Palabras/${nombreArchivo}.mp4`);
-                    encontrado = true;
-                    break;
-                }
+            if (conjugaciones[verbo].includes(palabra)) {
+                const nombreArchivo = (verbo === "contar" || verbo === "narrar") ? "Contar o Narrar" : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+                videoPaths.push(`Palabras/${nombreArchivo}.mp4`);
+                detectado = true;
+                break;
             }
-            if (encontrado) break;
         }
-        if (encontrado) continue;
+        if (detectado) continue;
 
         // Palabras fijas
-        for (let palabraFija in palabrasFijas) {
-            if (palabra === palabraFija) {
-                videoPaths.push(`Palabras/${palabrasFijas[palabraFija]}.mp4`);
+        for (let clave in palabrasFijas) {
+            if (palabra === clave) {
+                videoPaths.push(`Palabras/${palabrasFijas[clave]}.mp4`);
                 break;
             }
         }
@@ -135,7 +168,7 @@ function reproducirVideoSegunTexto(text) {
     }
 }
 
-// Función que reproduce una lista de videos uno tras otro, con delay de 200 ms entre ellos
+// Función para reproducir los videos uno tras otro con delay
 function reproducirVideosEnCadena(videoPaths) {
     let index = 0;
 
@@ -154,7 +187,7 @@ function reproducirVideosEnCadena(videoPaths) {
             setTimeout(() => {
                 index++;
                 reproducirSiguiente();
-            }, 200); // Delay de 200ms
+            }, 200);
         };
     }
 
