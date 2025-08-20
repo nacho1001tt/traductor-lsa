@@ -13,20 +13,26 @@ const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecog
 reconocimiento.lang = 'es-ES'; // Idioma español
 
 boton.addEventListener('click', () => {
-    reconocimiento.start(); // Inicia el reconocimiento de voz
+    activarMicrofono();        // 🔴 Enciende el indicador
+    reconocimiento.start();    // Inicia el reconocimiento de voz
 });
 
 reconocimiento.onresult = (event) => {
     const speechText = event.results[0][0].transcript.toLowerCase();
-    texto.textContent = speechText;
+    mostrarTextoReconocido(speechText);
     procesarTextoSecuencial(speechText);
+};
+
+// 🔹 Apaga el indicador cuando finaliza el reconocimiento
+reconocimiento.onend = () => {
+    desactivarMicrofono();     // 🔴 Apaga el indicador
 };
 
 entradaTexto.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
         const userInput = entradaTexto.value.toLowerCase();
-        texto.textContent = userInput;
+        mostrarTextoReconocido(userInput);
         procesarTextoSecuencial(userInput);
     }
 });
