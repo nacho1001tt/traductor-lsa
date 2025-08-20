@@ -1,59 +1,63 @@
-/* Fuente elegante de Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f4f6f9, #e2e8f0);
-    color: #333;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: #fff;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
+    padding: 40px 20px;
 }
 
-/* Contenedor central */
+/* Contenedor principal */
 .container {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     padding: 2rem;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    width: 90%;
-    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
     animation: fadeIn 0.8s ease;
 }
 
 /* Título */
 h1 {
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 2.2rem;
     margin-bottom: 1.5rem;
-    color: #2b6cb0;
+    color: #fff;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
 }
 
-/* Input de texto */
+/* Input y botón */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 input[type="text"] {
     padding: 12px 16px;
-    width: 70%;
+    flex: 1;
     border-radius: 12px;
-    border: 2px solid #cbd5e0;
+    border: none;
     font-size: 1rem;
     outline: none;
-    transition: all 0.3s ease;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
 }
 
-input[type="text"]:focus {
-    border-color: #2b6cb0;
-    box-shadow: 0 0 8px rgba(43, 108, 176, 0.3);
-}
-
-/* Botón */
 button {
     padding: 12px 20px;
-    margin-left: 10px;
-    background: #2b6cb0;
+    background: #ff6a00;
     color: white;
     border: none;
     border-radius: 12px;
@@ -63,36 +67,48 @@ button {
 }
 
 button:hover {
-    background: #2c5282;
+    background: #e65c00;
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(43, 108, 176, 0.3);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Video */
+/* Video centrado */
 video {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     border-radius: 16px;
     max-width: 100%;
     display: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     transition: opacity 0.5s ease;
 }
 
-/* Animación de aparición */
+/* Sección de información */
+.info {
+    background: rgba(255,255,255,0.1);
+    padding: 1.5rem;
+    border-radius: 15px;
+    line-height: 1.6;
+}
+
+.info h2 {
+    margin-top: 0;
+    color: #ffe082;
+}
+
+.info ul {
+    list-style-type: "👉 ";
+    padding-left: 1rem;
+}
+
+/* Animación */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsividad */
-@media (max-width: 600px) {
-    input[type="text"] {
-        width: 100%;
-        margin-bottom: 1rem;
-    }
-
-    button {
-        width: 100%;
-        margin-left: 0;
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
     }
 }
