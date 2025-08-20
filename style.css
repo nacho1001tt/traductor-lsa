@@ -15,8 +15,8 @@ body {
 
 /* Contenedor principal */
 .container {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+    backdrop-filter: blur(14px);
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -38,10 +38,13 @@ body {
 /* Título */
 h1 {
     font-weight: 700;
-    font-size: 2.2rem;
+    font-size: 2.3rem;
     margin-bottom: 1.5rem;
     text-align: center;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
 }
 
 /* Input y botón */
@@ -60,24 +63,27 @@ input[type="text"] {
     border: none;
     font-size: 1rem;
     outline: none;
+    background: rgba(255,255,255,0.9);
+    color: #333;
     box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
 }
 
 button {
     padding: 12px 20px;
-    background: #ff6a00;
+    background: linear-gradient(135deg, #ff6a00, #ff9a00);
     color: white;
     border: none;
     border-radius: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 button:hover {
-    background: #e65c00;
+    background: linear-gradient(135deg, #e65c00, #ff8000);
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
 }
 
 /* Texto de lo que se reconoce */
@@ -85,7 +91,9 @@ button:hover {
     font-size: 1.3rem;
     margin-top: 10px;
     font-weight: bold;
-    color: #ffe082;
+    background: linear-gradient(90deg, #ffecd2, #fcb69f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* Video */
@@ -96,21 +104,24 @@ video {
     width: 480px;
     display: none;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255,255,255,0.3);
     transition: opacity 0.5s ease;
 }
 
 /* Columna derecha */
 .info {
-    background: rgba(255,255,255,0.15);
-    padding: 1.5rem;
+    background: linear-gradient(160deg, rgba(0,0,0,0.25), rgba(255,255,255,0.1));
+    padding: 1.8rem;
     border-radius: 15px;
-    line-height: 1.6;
-    color: #fff;
+    line-height: 1.7;
+    color: #f0f0f0;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
 .info h2 {
     margin-top: 0;
-    color: #ffe082;
+    color: #ffcc70;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
 }
 
 .info ul {
@@ -141,5 +152,9 @@ video {
 
     video {
         width: 100%;
+    }
+
+    .info {
+        text-align: left;
     }
 }
