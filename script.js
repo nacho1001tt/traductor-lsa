@@ -170,6 +170,13 @@ function procesarTextoSecuencial(text) {
     reproducirSecuencialmente(videosAReproducir);
 }
 
+// ====== Velocidad global (fix) ======
+let currentSpeed = (() => {
+  const sc = document.getElementById("speedControl");
+  const val = sc ? parseFloat(sc.value) : NaN;
+  return Number.isFinite(val) ? val : 0.75;
+})();
+
 // Reproduce los videos uno tras otro con delay de 100ms
 function reproducirSecuencialmente(lista) {
     if (lista.length === 0) {
@@ -182,8 +189,8 @@ function reproducirSecuencialmente(lista) {
     videoSeña.load();
     videoSeña.style.display = "block";
 
-    // Ajustar la velocidad de reproducción (valor por defecto)
-    videoSeña.playbackRate = 0.75;
+    // ✅ Usar la velocidad actual elegida por el usuario (no pisar con 0.75)
+    videoSeña.playbackRate = currentSpeed;
 
     videoSeña.onended = () => {
         setTimeout(() => {
@@ -200,10 +207,16 @@ function reproducirSecuencialmente(lista) {
 // 🎚 Control de velocidad
 const speedControl = document.getElementById("speedControl");
 const speedValue = document.getElementById("speedValue");
+
+// Sincronizar la etiqueta al cargar
+if (speedValue && speedControl) {
+  speedValue.textContent = parseFloat(speedControl.value) + "x";
+}
+
 speedControl.addEventListener("input", () => {
-  const speed = parseFloat(speedControl.value);
-  videoSeña.playbackRate = speed;
-  speedValue.textContent = speed + "x";
+  currentSpeed = parseFloat(speedControl.value);   // actualizar velocidad global
+  videoSeña.playbackRate = currentSpeed;           // aplicar de inmediato si está reproduciendo
+  speedValue.textContent = currentSpeed + "x";
 });
 
 // 🎤 Indicador de micrófono
