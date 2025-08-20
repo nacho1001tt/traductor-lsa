@@ -8,42 +8,40 @@
 </head>
 <body>
 
-    <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
+    <div class="container">
+        <!-- Columna izquierda -->
+        <div class="left">
+            <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
+            
+            <div class="controls">
+                <button id="start">🎤 Hablar</button>
+                <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
+            </div>
 
-    <button id="start">Hablar</button>
+            <p id="texto"></p>
 
-    <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
-    <p id="texto"></p>
+            <video id="videoSeña" controls>
+                <source id="videoSource" src="" type="video/mp4">
+                Tu navegador no soporta la reproducción de videos.
+            </video>
+        </div>
 
-    <!-- Video centrado -->
-    <div id="videoContainer">
-        <video id="videoSeña" controls>
-            <source id="videoSource" src="" type="video/mp4">
-            Tu navegador no soporta la reproducción de videos.
-        </video>
+        <!-- Columna derecha -->
+        <div class="right info">
+            <h2>ℹ️ Información sobre el proyecto</h2>
+            <p>
+                Somos un grupo de estudiantes interesados en aportar nuestro grano de arena a la inclusión de personas con
+                pérdidas auditivas. Nuestro objetivo fue desarrollar un traductor de voz y texto a lengua de señas para mejorar
+                la comunicación y el aprendizaje.
+            </p>
+            <ul>
+                <li><strong>Luana Vazquez</strong>: Intérprete, la cara más visible del proyecto</li>
+                <li><strong>Fernando Vázquez</strong>: Conocimiento previo sobre el lenguaje de señas</li>
+                <li><strong>Ignacio Vergara</strong>: Programador y diseñador de la página web</li>
+            </ul>
+        </div>
     </div>
 
-    <!-- Información sobre el proyecto -->
-    <footer id="infoProyecto">
-        <h2>Información sobre el proyecto</h2>
-        <p>Somos un grupo de estudiantes interesados en aportar nuestro grano de arena a la inclusión de personas con pérdidas auditivas.  
-        Nuestro objetivo fue desarrollar un traductor de voz y texto a lengua de señas para mejorar la comunicación y el aprendizaje.  
-        </p>
-        <ul>
-            <li><b>Integrantes del grupo </b>
-            <li><b>Luana Vazquez</b> Intérprete, la cara más visible del proyecto</li>
-            <li><b>Fernando Vázquez</b> Conocimiento previo sobre el lenguaje de señas</li>
-            <li><b>Ignacio Vergara:</b> Programador y diseñador de la página web</li>
-        </ul>
-    </footer>
-
     <script src="script.js"></script>
-    <script>
-        // Ajustar velocidad de reproducción a 0.75
-        const video = document.getElementById("videoSeña");
-        video.playbackRate = 0.75;
-    </script>
 </body>
 </html>
-
-
