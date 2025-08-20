@@ -1,99 +1,98 @@
-/* Estilos globales */
+/* Fuente elegante de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
 body {
-    font-family: 'Arial', sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #6a11cb, #2575fc, #ff6a00, #ffcc00); /* Paleta más variada */
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f4f6f9, #e2e8f0);
+    color: #333;
     margin: 0;
     padding: 0;
-    color: white;
-    min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-/* Título principal */
+/* Contenedor central */
+.container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+}
+
+/* Título */
 h1 {
-    color: white;
-    font-size: 3rem;
-    margin-top: 40px;
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* Botón de inicio */
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 10px;
-    margin-top: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-    background-color: #0056b3;
-    transition: background-color 0.3s ease;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #2b6cb0;
 }
 
 /* Input de texto */
-#entradaTexto {
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 1.2rem;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    width: 60%;
-    max-width: 400px;
-}
-
-/* Estilos para el texto de reconocimiento */
-#texto {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #f3f3f3;
-}
-
-/* Contenedor del video */
-#videoContainer {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-}
-
-/* Video centrado y más grande */
-#videoSeña {
-    width: 640px;   /* antes 320 */
-    height: 480px;  /* antes 240 */
+input[type="text"] {
+    padding: 12px 16px;
+    width: 70%;
     border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-    background: black;
+    border: 2px solid #cbd5e0;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-/* Footer del proyecto */
-#infoProyecto {
-    margin-top: auto;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 30px 20px;
-    text-align: left;
-    color: #f1f1f1;
+input[type="text"]:focus {
+    border-color: #2b6cb0;
+    box-shadow: 0 0 8px rgba(43, 108, 176, 0.3);
 }
 
-#infoProyecto h2 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: #ffe082;
+/* Botón */
+button {
+    padding: 12px 20px;
+    margin-left: 10px;
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-#infoProyecto ul {
-    list-style: none;
-    padding-left: 0;
+button:hover {
+    background: #2c5282;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(43, 108, 176, 0.3);
 }
 
-#infoProyecto li {
-    margin: 5px 0;
-    font-size: 1.1rem;
+/* Video */
+video {
+    margin-top: 2rem;
+    border-radius: 16px;
+    max-width: 100%;
+    display: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: opacity 0.5s ease;
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+    input[type="text"] {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        width: 100%;
+        margin-left: 0;
+    }
 }
