@@ -4,6 +4,7 @@ const texto = document.getElementById('texto');
 const videoSeña = document.getElementById('videoSeña');
 const videoSource = document.getElementById('videoSource');
 const entradaTexto = document.getElementById('entradaTexto');
+const startText = document.getElementById('startText'); // Texto del botón
 
 // Ocultar el video al cargar la página
 videoSeña.style.display = "none";
@@ -13,8 +14,9 @@ const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecog
 reconocimiento.lang = 'es-ES'; // Idioma español
 
 boton.addEventListener('click', () => {
-    activarMicrofono();        // 🔴 Enciende el indicador
-    reconocimiento.start();    // Inicia el reconocimiento de voz
+    activarMicrofono();                    // Enciende indicador
+    if (startText) startText.textContent = "Escuchando..."; // Cambia texto del botón
+    reconocimiento.start();                // Inicia el reconocimiento de voz
 });
 
 reconocimiento.onresult = (event) => {
@@ -23,9 +25,10 @@ reconocimiento.onresult = (event) => {
     procesarTextoSecuencial(speechText);
 };
 
-// 🔹 Apaga el indicador cuando finaliza el reconocimiento
+// Apaga el indicador cuando finaliza el reconocimiento
 reconocimiento.onend = () => {
-    desactivarMicrofono();     // 🔴 Apaga el indicador
+    desactivarMicrofono();
+    if (startText) startText.textContent = "Hablar"; // Restaura texto del botón
 };
 
 entradaTexto.addEventListener('keypress', (event) => {
@@ -179,7 +182,7 @@ function reproducirSecuencialmente(lista) {
     videoSeña.load();
     videoSeña.style.display = "block";
 
-    // Ajustar la velocidad de reproducción
+    // Ajustar la velocidad de reproducción (valor por defecto)
     videoSeña.playbackRate = 0.75;
 
     videoSeña.onended = () => {
@@ -192,7 +195,7 @@ function reproducirSecuencialmente(lista) {
 
 
 
-// ================== 📌 BLOQUE EXTRA AGREGADO ==================
+// ================== BLOQUE EXTRA AGREGADO ==================
 
 // 🎚 Control de velocidad
 const speedControl = document.getElementById("speedControl");
