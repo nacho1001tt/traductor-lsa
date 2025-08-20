@@ -168,14 +168,20 @@ function reproducirSecuencialmente(lista) {
         return;
     }
 
-    const path = lista.shift();
-    videoSource.src = path;
-    videoSeña.load();
-    videoSeña.style.display = "block";
-    videoSeña.onended = () => {
-        setTimeout(() => {
-            reproducirSecuencialmente(lista);
-        }, 100); // delay de 100ms
-    };
-    videoSeña.play();
+const path = lista.shift();
+videoSource.src = path;
+videoSeña.load();
+videoSeña.style.display = "block";
+
+// Ajustar la velocidad de reproducción
+videoSeña.playbackRate = 0.75;
+
+videoSeña.onended = () => {
+    setTimeout(() => {
+        reproducirSecuencialmente(lista);
+    }, 100); // delay de 100ms
+};
+videoSeña.play();
+
 }
+
