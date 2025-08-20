@@ -2,31 +2,21 @@
 body {
     font-family: 'Arial', sans-serif;
     text-align: center;
-    background: linear-gradient(135deg, #6a11cb, #2575fc); /* Fondo degradado */
+    background: linear-gradient(135deg, #6a11cb, #2575fc, #ff6a00, #ffcc00); /* Paleta más variada */
     margin: 0;
     padding: 0;
     color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Título principal */
 h1 {
     color: white;
     font-size: 3rem;
-    margin-top: 50px;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Sombra para mejorar la legibilidad */
-}
-
-/* Descripción del proyecto */
-#descripcion {
-    font-size: 1.2rem;
-    margin-top: 20px;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
-    border-radius: 10px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    line-height: 1.5;
+    margin-top: 40px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* Botón de inicio */
@@ -39,7 +29,7 @@ button {
     cursor: pointer;
     border-radius: 10px;
     margin-top: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 button:hover {
@@ -47,18 +37,63 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
-/* Imagen de la seña */
-#imagenSeña {
-    width: 300px;
-    margin-top: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+/* Input de texto */
+#entradaTexto {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    width: 60%;
+    max-width: 400px;
 }
 
-/* Estilos para el texto que muestra lo que se está diciendo */
+/* Estilos para el texto de reconocimiento */
 #texto {
     font-size: 1.5rem;
     font-weight: bold;
     margin-top: 20px;
     color: #f3f3f3;
+}
+
+/* Contenedor del video */
+#videoContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* Video centrado y más grande */
+#videoSeña {
+    width: 640px;   /* antes 320 */
+    height: 480px;  /* antes 240 */
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    background: black;
+}
+
+/* Footer del proyecto */
+#infoProyecto {
+    margin-top: auto;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px 20px;
+    text-align: left;
+    color: #f1f1f1;
+}
+
+#infoProyecto h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #ffe082;
+}
+
+#infoProyecto ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#infoProyecto li {
+    margin: 5px 0;
+    font-size: 1.1rem;
 }
