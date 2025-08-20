@@ -168,20 +168,52 @@ function reproducirSecuencialmente(lista) {
         return;
     }
 
-const path = lista.shift();
-videoSource.src = path;
-videoSeña.load();
-videoSeña.style.display = "block";
+    const path = lista.shift();
+    videoSource.src = path;
+    videoSeña.load();
+    videoSeña.style.display = "block";
 
-// Ajustar la velocidad de reproducción
-videoSeña.playbackRate = 0.75;
+    // Ajustar la velocidad de reproducción
+    videoSeña.playbackRate = 0.75;
 
-videoSeña.onended = () => {
-    setTimeout(() => {
-        reproducirSecuencialmente(lista);
-    }, 100); // delay de 100ms
-};
-videoSeña.play();
-
+    videoSeña.onended = () => {
+        setTimeout(() => {
+            reproducirSecuencialmente(lista);
+        }, 100); // delay de 100ms
+    };
+    videoSeña.play();
 }
 
+
+
+// ================== 📌 BLOQUE EXTRA AGREGADO ==================
+
+// 🎚 Control de velocidad
+const speedControl = document.getElementById("speedControl");
+const speedValue = document.getElementById("speedValue");
+speedControl.addEventListener("input", () => {
+  const speed = parseFloat(speedControl.value);
+  videoSeña.playbackRate = speed;
+  speedValue.textContent = speed + "x";
+});
+
+// 🎤 Indicador de micrófono
+function activarMicrofono() {
+  boton.classList.add("mic-active");
+}
+function desactivarMicrofono() {
+  boton.classList.remove("mic-active");
+}
+
+// ✨ Glow en el texto cuando hay input
+function mostrarTextoReconocido(textoReconocido) {
+  texto.textContent = textoReconocido;
+  texto.classList.add("glow");
+  setTimeout(() => texto.classList.remove("glow"), 1000);
+}
+
+// ♿ Toggle de alto contraste
+const contrastToggle = document.getElementById("contrastToggle");
+contrastToggle.addEventListener("click", () => {
+  document.body.classList.toggle("high-contrast");
+});
