@@ -27,10 +27,8 @@
     <p id="texto"></p>
 
     <div class="video-container">
-      <!-- Importante: id sin ñ/tildes, y muted/playsinline para evitar bloqueos -->
-      <video id="videoSena" controls muted playsinline>
-        <!-- dejamos el <source> vacío, pero el JS cargará en video.src directamente -->
-        <source id="videoSource" src="" type="video/mp4"/>
+      <!-- id sin ñ/tildes, y cargamos el src desde JS -->
+      <video id="videoSena" controls muted playsinline style="display:none;">
         Tu navegador no soporta la reproducción de videos.
       </video>
 
