@@ -1,29 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Reproducción de Señas</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-  #texto { font-size: 1.5em; margin-bottom: 20px; }
-  video { max-width: 80%; margin-top: 20px; }
-</style>
-</head>
-<body>
-
-<h1>Reconocimiento de Voz a Señas</h1>
-
-<div id="texto">Texto reconocido aparecerá aquí</div>
-
-<input type="text" id="entradaTexto" placeholder="Escribe algo y presiona Enter" />
-
-<button id="start">🎤 Hablar</button>
-
-<video id="videoSeña" controls>
-  <source id="videoSource" src="" type="video/mp4">
-  Tu navegador no soporta HTML5 video.
-</video>
-
 <script>
   // =============================
   // Captura de elementos
