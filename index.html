@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Traductor de Voz y Texto a Lengua de Señas</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traductor de Voz y Texto a Lengua de Señas</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header>
     <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
-  </header>
 
-  <main>
-    <div class="controls">
-      <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí y presiona Enter...">
-    </div>
+    <button id="start">Hablar</button>
 
+    <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
     <p id="texto"></p>
 
-    <div class="video-container">
-      <video id="videoSeña" controls muted style="display:none;">
-        <source id="videoSource" src="" type="video/mp4">
-        Tu navegador no soporta la reproducción de videos.
-      </video>
+    <!-- Video centrado -->
+    <div id="videoContainer">
+        <video id="videoSeña" controls>
+            <source id="videoSource" src="" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+        </video>
     </div>
-  </main>
 
-  <script src="script.js"></script>
+    <!-- Información sobre el proyecto -->
+    <footer id="infoProyecto">
+        <h2>Información sobre el proyecto</h2>
+        <p>Somos un grupo de estudiantes comprometidos con la inclusión.  
+        Nuestro objetivo fue desarrollar un traductor de voz y texto a lengua de señas para mejorar la comunicación.  
+        </p>
+        <ul>
+            <li><b>Integrante 1:</b> Investigación y recopilación de videos</li>
+            <li><b>Integrante 2:</b> Programación en JavaScript</li>
+            <li><b>Integrante 3:</b> Diseño y maquetado de la página</li>
+            <li><b>Integrante 4:</b> Integración y pruebas</li>
+        </ul>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Ajustar velocidad de reproducción a 0.75
+        const video = document.getElementById("videoSeña");
+        video.playbackRate = 0.75;
+    </script>
 </body>
 </html>
