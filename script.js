@@ -1,65 +1,60 @@
-// script.js - versión revisada y robusta
+// script.js - Versión completa con manejo de .play().catch()
+// Mantuvimos exactamente tus conjugaciones, rutas "Palabras/..." y la estructura.
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  // --- Elementos del DOM (según tu HTML) ---
+  // --- Elementos del DOM ---
   const boton = document.getElementById('start');
   const texto = document.getElementById('texto');
   const videoSeña = document.getElementById('videoSeña');
   const videoSource = document.getElementById('videoSource');
   const entradaTexto = document.getElementById('entradaTexto');
+  const speedControl = document.getElementById('speedControl'); // opcional
+  const speedValue = document.getElementById('speedValue');     // opcional
+  const contrastToggle = document.getElementById('contrastToggle'); // opcional
 
-  // 🔊 Silenciar video para que el navegador permita reproducir automáticamente
-videoSeña.muted = true;
-
-// Ocultar el video al cargar la página
-videoSeña.style.display = "none";
-  
-  // slider de velocidad (si existe en tu HTML)
-  const speedControl = document.getElementById('speedControl'); // <input type="range" id="speedControl" ...>
-  const speedValue = document.getElementById('speedValue');     // <span id="speedValue">0.75x</span>
-
-  // compruebo elementos esenciales
+  // Verificación mínima
   if (!boton || !texto || !videoSeña || !videoSource || !entradaTexto) {
-    console.error('Faltan elementos HTML requeridos. Revisa que existan start, texto, videoSeña, videoSource y entradaTexto.');
-    return;
+    console.error('Faltan elementos HTML requeridos (start, texto, videoSeña, videoSource, entradaTexto).');
+    // no abortamos por completo para permitir pruebas parciales
   }
 
-  // Ocultar el video al cargar la página
+  // 🔊 Silenciar video para intentar permitir autoplay en navegadores que lo permiten
+  try { videoSeña.muted = true; } catch(e){ /* noop */ }
+
+  // Ocultar el video al inicio
   videoSeña.style.display = "none";
 
-  // Valor por defecto de velocidad
+  // Velocidad por defecto
   const DEFAULT_SPEED = 0.75;
   if (speedControl) {
-    // dejar el control sincronizado con el valor por defecto si no tiene valor
     if (!speedControl.value) speedControl.value = DEFAULT_SPEED;
     if (speedValue) speedValue.textContent = speedControl.value + "x";
-
     speedControl.addEventListener('input', () => {
       const s = parseFloat(speedControl.value) || DEFAULT_SPEED;
       videoSeña.playbackRate = s;
       if (speedValue) speedValue.textContent = s + "x";
     });
   } else {
-    // si no hay slider, fijo la velocidad por defecto
     videoSeña.playbackRate = DEFAULT_SPEED;
   }
 
-  // --- Reconocimiento de voz (Web Speech API) ---
-  const Recon = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!Recon) {
-    console.warn('Este navegador no soporta SpeechRecognition. Solo funcionará la entrada por texto.');
+  // Toggle alto contraste (si existe)
+  if (contrastToggle) {
+    contrastToggle.addEventListener('click', () => {
+      document.body.classList.toggle('high-contrast');
+    });
   }
-  const reconocimiento = Recon ? new Recon() : null;
-  if (reconocimiento) {
-    reconocimiento.lang = 'es-ES'; // idioma español
 
-    // Indicador visual para el micrófono (añade/quita clase .mic-active al botón)
-    reconocimiento.onstart = () => {
-      boton.classList.add('mic-active');
-    };
-    reconocimiento.onend = () => {
-      boton.classList.remove('mic-active');
-    };
+  // --- Reconocimiento de voz ---
+  const Recon = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const reconocimiento = Recon ? new Recon() : null;
+  if (!Recon) {
+    console.warn('SpeechRecognition no disponible en este navegador. Solo entrada por texto funcionará.');
+  } else {
+    reconocimiento.lang = 'es-ES';
+    reconocimiento.onstart = () => boton.classList.add('mic-active');
+    reconocimiento.onend = () => boton.classList.remove('mic-active');
 
     reconocimiento.onresult = (event) => {
       try {
@@ -73,19 +68,15 @@ videoSeña.style.display = "none";
   }
 
   boton.addEventListener('click', () => {
-    // Si no hay SpeechRecognition, avisar al usuario y no crash
     if (!reconocimiento) {
       alert('Reconocimiento de voz no disponible en este navegador.');
       return;
     }
-    try {
-      reconocimiento.start();
-    } catch (err) {
-      console.error('No se pudo iniciar el reconocimiento:', err);
-    }
+    try { reconocimiento.start(); }
+    catch (err) { console.error('No se pudo iniciar reconocimiento:', err); }
   });
 
-  // entrada por teclado (Enter)
+  // Tecla Enter en input
   entradaTexto.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -95,7 +86,7 @@ videoSeña.style.display = "none";
     }
   });
 
-  // --- Diccionarios (mantuve EXACTAMENTE tu estructura y conjugaciones) ---
+  // --- Tus conjugaciones (idénticas a las que proporcionaste) ---
   const conjugaciones = {
     dialogar: [
         "dialogar", "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
@@ -152,6 +143,7 @@ videoSeña.style.display = "none";
     ]
   };
 
+  // Palabras fijas
   const palabrasFijas = {
     "lengua oral": "Lengua oral",
     si: "Si",
@@ -168,42 +160,43 @@ videoSeña.style.display = "none";
     "nosotras": "Nosotros o Nosotras"
   };
 
-  // --- Funciones de UI auxiliares ---
+  // --- Funciones auxiliares ---
   function mostrarTextoReconocido(str) {
     texto.textContent = str || '';
-    // efecto glow: agregar clase y quitarla luego
     texto.classList.add('glow');
     setTimeout(() => texto.classList.remove('glow'), 900);
   }
 
-  // --- Procesamiento del texto -> lista de videos ---
+  // --- Procesar texto y armar lista de videos ---
   function procesarTextoSecuencial(text) {
     if (!text || !text.trim()) {
-      console.log('Texto vacío, no hay nada que reproducir.');
+      console.log('Texto vacío - nada que reproducir.');
       return;
     }
 
-    // mejor separar por espacios/puntuación
+    // separar por espacios/puntuación
     const palabras = text.split(/[\s,;?.!¡¿]+/).filter(Boolean);
     const videosAReproducir = [];
+
+    // para detecciones de frases
+    const fraseLower = text.toLowerCase();
 
     for (let palabra of palabras) {
       palabra = palabra.trim().toLowerCase();
       if (!palabra) continue;
 
-      // Frases fijas (prioritarias)
+      // Frases y expresiones (prioritarias)
       if (palabra === "hola") {
         videosAReproducir.push("Palabras/hola.mp4");
         continue;
       }
-      // comprobaciones que usaban `text.includes(...)` las dejo también (para frases múltiples)
-      if (text.includes("como estas") || text.includes("cómo estás")) {
+      if (fraseLower.includes("como estas") || fraseLower.includes("cómo estás")) {
         if (!videosAReproducir.includes("Palabras/comoestas.mp4")) videosAReproducir.push("Palabras/comoestas.mp4");
       }
-      if (text.includes("vos cómo te llamas") || text.includes("cómo te llamas")) {
+      if (fraseLower.includes("vos cómo te llamas") || fraseLower.includes("cómo te llamas")) {
         if (!videosAReproducir.includes("Palabras/comotellamas.mp4")) videosAReproducir.push("Palabras/comotellamas.mp4");
       }
-      if (text.includes("me llamo luana")) {
+      if (fraseLower.includes("me llamo luana")) {
         if (!videosAReproducir.includes("Palabras/llamoluana.mp4")) videosAReproducir.push("Palabras/llamoluana.mp4");
       }
 
@@ -233,10 +226,10 @@ videoSeña.style.display = "none";
           break;
         }
       }
-    }
+    } // end for
 
     if (videosAReproducir.length === 0) {
-      console.log('No se encontró ningún video para las palabras ingresadas.');
+      console.log('No se encontró video para las palabras ingresadas.');
       videoSeña.style.display = "none";
       return;
     }
@@ -244,7 +237,7 @@ videoSeña.style.display = "none";
     reproducirSecuencialmente(videosAReproducir);
   }
 
-  // --- Reproducción secuencial con manejo de errores en play() ---
+  // --- Reproducción secuencial con .play().catch(...) ---
   function reproducirSecuencialmente(lista) {
     if (!Array.isArray(lista) || lista.length === 0) {
       videoSeña.style.display = "none";
@@ -254,56 +247,53 @@ videoSeña.style.display = "none";
     const path = lista.shift();
     console.log('Reproduciendo:', path);
 
-    // actualizar la fuente y preparar reproducción
+    // actualizar fuente
     videoSource.src = path;
-    // forzar reload de la fuente
-    try {
-      videoSeña.load();
-    } catch (err) {
-      console.warn('videoSeña.load() falló:', err);
-    }
 
-    // mostrar video
+    // cargar
+    try { videoSeña.load(); } catch (err) { console.warn('video.load() dio error:', err); }
+
+    // mostrar el video (para que el usuario pueda darle play manual si es necesario)
     videoSeña.style.display = "block";
 
-    // asegurar playbackRate según slider o por defecto
+    // ajustar velocidad
     const velocidad = speedControl ? parseFloat(speedControl.value) || DEFAULT_SPEED : DEFAULT_SPEED;
     videoSeña.playbackRate = velocidad;
 
-    // manejar error de carga
+    // si ocurre error en la carga, pasar al siguiente
     videoSeña.onerror = (ev) => {
-      console.error('Error al cargar/reproducir el video:', ev);
-      // intentar continuar con siguiente video
+      console.error('Error cargando el video:', ev);
       setTimeout(() => reproducirSecuencialmente(lista), 250);
     };
 
-    // cuando termine, esperar delay y reproducir siguiente
+    // cuando termine, reproducir siguiente después del delay
     const DELAY_MS = 100;
     videoSeña.onended = () => {
-      setTimeout(() => {
-        reproducirSecuencialmente(lista);
-      }, DELAY_MS);
+      setTimeout(() => reproducirSecuencialmente(lista), DELAY_MS);
     };
 
-    // intentar reproducir y capturar errores (autoplay, codecs, etc.)
+    // Intentar reproducir y capturar rechazo (autoplay policies)
     const playPromise = videoSeña.play();
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
-          // éxito
+          // reproducción iniciada correctamente
+          console.log('play() OK:', path);
         })
         .catch((err) => {
-          console.error('Error en video.play():', err);
-          // Si falla (política autoplay) intentar mostrar un control visual para que el usuario pulse "play" manualmente:
-          // mostramos un mensaje en consola y ocultamos el video para evitar bucles
-          videoSeña.style.display = "none";
-          alert('No se pudo reproducir automáticamente el video. Por favor, hacé click en el botón "Reproducir" del video para continuar.');
+          console.warn('play() rechazado por el navegador (autoplay):', err);
+          // dejar video cargado y visible para que el usuario pulse "play" manualmente:
+          texto.innerHTML = `No se pudo reproducir automáticamente el video. Hacé click en el botón "Reproducir" del video para continuar.`;
+          // el video ya está cargado (videoSource.src), permanecerá visible en pausa
+          try { videoSeña.pause(); } catch(e){/* noop */ }
+          // NO avanzar automáticamente — se esperará a que el usuario pulse play
         });
     }
   }
 
-  // --- Opcional: exposición de funciones para debug en consola ---
-  window._procesarTextoSecuencial = procesarTextoSecuencial;
-  window._reproducirSecuencialmente = reproducirSecuencialmente;
+  // --- Exponer funciones para debug si querés desde consola ---
+  window._procesarTexto = procesarTextoSecuencial;
+  window._reproducir = reproducirSecuencialmente;
+  window._conjugaciones = conjugaciones;
 
-});
+}); // end DOMContentLoaded
