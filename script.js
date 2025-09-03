@@ -1,233 +1,142 @@
-// ==========================================================
-// ==============  Traductor Voz/Text → Señas  ==============
-// ==========================================================
-
-// Capturamos los elementos del HTML
+// Elementos del DOM
 const boton = document.getElementById('start');
+const entradaTexto = document.getElementById('entradaTexto');
 const texto = document.getElementById('texto');
 const videoSeña = document.getElementById('videoSeña');
 const videoSource = document.getElementById('videoSource');
-const entradaTexto = document.getElementById('entradaTexto');
-const startText = document.getElementById('startText'); // Texto del botón
+const startText = document.getElementById('startText');
 
-// Ocultar el video al cargar la página
 videoSeña.style.display = "none";
 
-// Configuramos el reconocimiento de voz
+// Configuración de velocidad
+const speedControl = document.getElementById("speedControl");
+const speedValue = document.getElementById("speedValue");
+let currentSpeed = parseFloat(speedControl.value) || 0.75;
+speedValue.textContent = currentSpeed + "x";
+
+speedControl.addEventListener("input", () => {
+    currentSpeed = parseFloat(speedControl.value);
+    videoSeña.playbackRate = currentSpeed;
+    speedValue.textContent = currentSpeed + "x";
+});
+
+// Micrófono activo/desactivo
+function activarMicrofono() { boton.classList.add("mic-active"); }
+function desactivarMicrofono() { boton.classList.remove("mic-active"); }
+
+// Mostrar texto reconocido
+function mostrarTextoReconocido(t) {
+    texto.textContent = t;
+    texto.classList.add("glow");
+    setTimeout(() => texto.classList.remove("glow"), 1000);
+}
+
+// ==== Reconocimiento de voz ====
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-reconocimiento.lang = 'es-ES'; // Idioma español
+reconocimiento.lang = 'es-ES';
 
 boton.addEventListener('click', () => {
-    activarMicrofono();                    
-    if (startText) startText.textContent = "Escuchando..."; 
-    reconocimiento.start();                
+    reconocimiento.start();
+    activarMicrofono();
+    if(startText) startText.textContent = "Escuchando...";
 });
 
 reconocimiento.onresult = (event) => {
-    const speechText = event.results[0][0].transcript.toLowerCase();
+    const speechText = event.results[0][0].transcript;
     mostrarTextoReconocido(speechText);
     procesarTextoSecuencial(speechText);
 };
 
 reconocimiento.onend = () => {
     desactivarMicrofono();
-    if (startText) startText.textContent = "Hablar"; 
+    if(startText) startText.textContent = "Hablar";
 };
 
-entradaTexto.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        const userInput = entradaTexto.value.toLowerCase();
+// ==== Entrada de texto ====
+entradaTexto.addEventListener('keypress', (e) => {
+    if(e.key === "Enter") {
+        e.preventDefault();
+        const userInput = entradaTexto.value;
         mostrarTextoReconocido(userInput);
         procesarTextoSecuencial(userInput);
     }
 });
 
-// ==========================================================
-// ===============  Conjugaciones por verbo  =================
-const conjugaciones = {
-    dialogar: ["dialogar","dialogo","dialogás","dialogas","dialoga","dialogamos","dialogan","dialogué","dialogaste","dialogó","dialogamos","dialogaron","dialogaba","dialogabas","dialogábamos","dialogaban","dialogaré","dialogarás","dialogará","dialogaremos","dialogarán","dialogaría","dialogarías","dialogaríamos","dialogarían","dialogando","dialogado","he dialogado","hemos dialogado","han dialogado"],
-    hablar: ["hablar","hablo","hablás","hablas","habla","hablamos","hablan","hablé","hablaste","habló","hablamos","hablaron","hablaba","hablabas","hablábamos","hablaban","hablaré","hablarás","hablará","hablaremos","hablarán","hablaría","hablarías","hablaríamos","hablarían","hablando","hablado","he hablado","hemos hablado","han hablado"],
-    decir: ["decir","digo","decís","dices","dice","decimos","dicen","dije","dijiste","dijo","dijimos","dijeron","decía","decías","decíamos","decían","diré","dirás","dirá","diremos","dirán","diría","dirías","diríamos","dirían","diciendo","dicho","he dicho","hemos dicho","han dicho"],
-    contar: ["contar","cuento","contás","contas","cuenta","contamos","cuentan","conté","contaste","contó","contamos","contaron","contaba","contabas","contábamos","contaban","contaré","contarás","contará","contaremos","contarán","contaría","contarías","contaríamos","contarían","contando","contado","he contado","hemos contado","han contado"],
-    narrar: ["narrar","narro","narrás","narras","narra","narramos","narran","narré","narraste","narró","narramos","narraron","narraba","narrabas","narrábamos","narraban","narraré","narrarás","narrará","narraremos","narrarán","narrando","narrado","he narrado","hemos narrado","han narrado"],
-    explicar: ["explicar","explico","explicás","explicas","explica","explicamos","explican","expliqué","explicaste","explicó","explicamos","explicaron","explicaba","explicabas","explicábamos","explicaban","explicaré","explicarás","explicará","explicaremos","explicarán","explicando","explicado","he explicado","hemos explicado","han explicado"],
-    estar: ["estar","estoy","estás","está","estamos","están","estuve","estuviste","estuvo","estuvimos","estuvieron","estaba","estabas","estábamos","estaban","estaré","estarás","estará","estaremos","estarán","estando","estado","he estado","hemos estado","han estado"],
-    apurar: ["apurar","apuro","apurás","apuras","apura","apuramos","apuran","apuré","apuraste","apuró","apuramos","apuraron","apuraba","apurabas","apurábamos","apuraban","apuraré","apurarás","apurará","apuraremos","apurarán","apuraría","apurarías","apuraríamos","apurarían","apurando","apurado","he apurado","hemos apurado","han apurado"],
-    llegar: ["llegar","llego","llegás","llegas","llega","llegamos","llegan","llegué","llegaste","llegó","llegamos","llegaron","llegaba","llegabas","llegábamos","llegaban","llegaré","llegarás","llegará","llegaremos","llegarán","llegaría","llegarías","llegaríamos","llegarían","llegando","llegado","he llegado","hemos llegado","han llegado"]
+// ==== Funciones de normalización de texto ====
+function limpiarTexto(texto) {
+    return texto
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .replace(/[.,!?]/g,"")
+        .trim();
+}
+
+// ==== Lista completa de palabras y verbos con conjugaciones ====
+const videos = {
+    "hablar": ["hablar","hablo","hablas","habla","hablamos","habláis","hablan","hablé","hablaste","habló","hablamos","hablasteis","hablaron","hablaré","hablarás","hablará","hablaremos","hablaréis","hablarán","hablando","hablado"],
+    "decir": ["decir","digo","dices","dice","decimos","decís","dicen","dije","dijiste","dijo","dijimos","dijisteis","dijeron","diré","dirás","dirá","diremos","diréis","dirán","diciendo","dicho"],
+    "contar o narrar": ["contar o narrar","cuento","cuentas","cuenta","contamos","contáis","cuentan","conté","contaste","contó","contamos","contasteis","contaron","contaré","contarás","contará","contaremos","contaréis","contarán","contando","contado"],
+    "estar": ["estar","estoy","estás","está","estamos","estáis","están","estuve","estuviste","estuvo","estuvimos","estuvisteis","estuvieron","estaré","estarás","estará","estaremos","estaréis","estarán","estando","estado"],
+    "explicar": ["explicar","explico","explicas","explica","explicamos","explicáis","explican","expliqué","explicaste","explicó","explicamos","explicasteis","explicaron","explicaré","explicarás","explicará","explicaremos","explicaréis","explicarán","explicando","explicado"],
+    "negar": ["negar","niego","niegas","niega","negamos","negáis","niegan","negué","negaste","negó","negamos","negasteis","negaron","negaré","negarás","negará","negaremos","negaréis","negarán","negando","negado"],
+    "apurar": ["apurar","apuro","apuras","apura","apuramos","apuráis","apuran","apuré","apuraste","apuró","apuramos","apurasteis","apuraron","apuraré","apurarás","apurará","apuraremos","apuraréis","apurarán","apurando","apurado"],
+    "llegar":["llegar","llego","llegas","llega","llegamos","llegáis","llegan","llegué","llegaste","llegó","llegamos","llegasteis","llegaron","llegaré","llegarás","llegará","llegaremos","llegaréis","llegarán","llegando","llegado"],
+
+    // Pronombres, adverbios, sustantivos y letras
+    "no":["no"], "si":["si","sí"], "tambien":["tambien","también"], "tampoco":["tampoco"], "yo":["yo"], "vos":["vos"], "ustedes":["ustedes"], "nosotros o nosotras":["nosotros o nosotras"],
+    "a veces":["a veces"], "anteayer":["anteayer"], "ayer":["ayer"], "año pasado":["año pasado"], "año":["año"], "cerca":["cerca"], "como estas":["como estas","cómo estás"], "como quieras":["como quieras"], 
+    "comoestas":["comoestas"], "comotellamas":["comotellamas","cómo te llamas"], "derecha":["derecha"], "despacio":["despacio"], "después":["después"], "domingo":["domingo"], 
+    "enseguida":["enseguida"], "futuro":["futuro"], "hace poco":["hace poco"], "hasta":["hasta"], "hola":["hola"], "hora":["hora"], "hoy":["hoy"], "importante":["importante"], "izquierda":["izquierda"], 
+    "jamás":["jamás"], "jueves":["jueves"], "limpio":["limpio"], "llamoluana":["llamoluana"], "lo siento":["lo siento"], "lunes":["lunes"], "martes":["martes"], "mañana":["mañana"], "mediodía":["mediodía"], 
+    "mes":["mes"], "minuto":["minuto"], "miércoles":["miércoles"], "pasado":["pasado"], "primeravez":["primeravez"], "rápido":["rápido"], "sabado":["sabado"], "semana":["semana"], "siempre":["siempre"], 
+    "tarde":["tarde"], "temprano":["temprano"], "tiempo":["tiempo"], "todalanoche":["todalanoche"], "todavía":["todavía"], "todoslosdias":["todoslosdias"], "viernes":["viernes"], "último":["último"],
+    // Letras
+    "letraA":["letraA"], "letraB":["letraB"], "letraC":["letraC"], "letraCH":["letraCH"], "letraD":["letraD"], "letraE":["letraE"], "letraF":["letraF"], "letraG":["letraG"], "letraH":["letraH"], "letraI":["letraI"], "letraJ":["letraJ"], "letraK":["letraK"], "letraL":["letraL"], 
+    "letraLL":["letraLL"], "letraM":["letraM"], "letraN":["letraN"], "letraO":["letraO"], "letraP":["letraP"], "letraQ":["letraQ"], "letraR":["letraR"], "letraS":["letraS"], "letraT":["letraT"], "letraU":["letraU"], 
+    "letraV":["letraV"], "letraW":["letraW"], "letraX":["letraX"], "letraY":["letraY"], "letraZ":["letraZ"], "letraÑ":["letraÑ"]
 };
 
-// ==========================================================
-// ==================  Palabras fijas  =======================
-const palabrasFijas = {
-    "lengua oral": "lengua_oral",
-    si: "si", "sí": "si",
-    no: "no",
-    negar: "negar",
-    también: "tambien", "tambien": "tambien",
-    tampoco: "tampoco",
-    yo: "yo",
-    vos: "vos",
-    ustedes: "ustedes",
-    el: "el_o_ella",
-    ella: "el_o_ella",
-    nosotros: "nosotros_o_nosotras",
-    nosotras: "nosotros_o_nosotras",
-    "ayer": "ayer",
-    "hoy": "hoy",
-    "mañana": "manana", "manana": "manana",
-    "año": "ano", "ano": "ano",
-    "año pasado": "ano_pasado", "ano pasado": "ano_pasado",
-    "futuro": "futuro",
-    "pasado": "pasado",
-    "último": "ultimo", "ultimo": "ultimo",
-    "minuto": "minuto",
-    "hora": "hora",
-    "mes": "mes",
-    "semana": "semana",
-    "domingo": "domingo",
-    "lunes": "lunes",
-    "martes": "martes",
-    "miércoles": "miercoles", "miercoles": "miercoles",
-    "jueves": "jueves",
-    "viernes": "viernes",
-    "sábado": "sabado", "sabado": "sabado",
-    "mediodía": "mediodia", "mediodia": "mediodia",
-    "todavía": "todavia", "todavia": "todavia",
-    "siempre": "siempre",
-    "rápido": "rapido", "rapido": "rapido",
-    "despacio": "despacio",
-    "temprano": "temprano",
-    "tarde": "tarde",
-    "cerca": "cerca",
-    "derecha": "derecha",
-    "izquierda": "izquierda",
-    "importante": "importante",
-    "limpio": "limpio",
-    "hola": "hola"
-};
+// ==== Función principal ====
+function procesarTextoSecuencial(textoRaw) {
+    if(!textoRaw) return;
 
-// ==========================================================
-// =========  Procesamiento secuencial (con frases) =========
-function procesarTextoSecuencial(text) {
-    // Limpiamos signos de puntuación y normalizamos tildes
-    text = text.toLowerCase()
-               .replace(/[.,!?]/g,"")
-               .replace(/á/g,"a")
-               .replace(/é/g,"e")
-               .replace(/í/g,"i")
-               .replace(/ó/g,"o")
-               .replace(/ú/g,"u")
-               .replace(/ñ/g,"n");
+    const text = limpiarTexto(textoRaw);
+    const palabras = text.split(" ").filter(p => p.trim() !== "");
 
-    const palabras = text.split(" ");
     const videosAReproducir = [];
 
-    // ---- Frases fijas ----
-    const frases = {
-        "como estas": "como_estas",
-        "como quieres": "como_quieres",
-        "vos como te llamas": "como_te_llamas",
-        "me llamo luana": "llamo_luana",
-        "lo siento": "lo_siento",
-        "hace poco": "hace_poco",
-        "a veces": "a_veces",
-        "toda la noche": "toda_la_noche",
-        "todos los dias": "todos_los_dias",
-        "primera vez": "primera_vez",
-        "ano pasado": "ano_pasado"
-    };
-
-    for (let frase in frases) {
-        if (text.includes(frase)) {
-            videosAReproducir.push(`Palabras/${frases[frase]}.mp4`);
-        }
-    }
-
-    // ---- Palabras individuales ----
-    for (let palabra of palabras) {
-        palabra = palabra.trim();
-
-        // Letras
-        const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-        if (letras.includes(palabra)) {
-            videosAReproducir.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
-            continue;
-        }
-
-        // Verbo conjugado
-        for (let verbo in conjugaciones) {
-            if (conjugaciones[verbo].includes(palabra)) {
-                const nombreArchivo = (verbo === "contar" || verbo === "narrar")
-                    ? "Contar_o_Narrar"
-                    : verbo.charAt(0).toUpperCase() + verbo.slice(1);
-                videosAReproducir.push(`Palabras/${nombreArchivo}.mp4`);
+    palabras.forEach(p => {
+        for(const key in videos){
+            if(videos[key].includes(p)){
+                videosAReproducir.push(`Palabras/${key.replace(/ /g,"%20")}.mp4`);
                 break;
             }
         }
+    });
 
-        // Palabras fijas
-        if (palabrasFijas[palabra]) {
-            videosAReproducir.push(`Palabras/${palabrasFijas[palabra]}.mp4`);
-        }
-    }
-
-    reproducirSecuencialmente(videosAReproducir);
+    reproducirSecuencial(videosAReproducir);
 }
 
-// ==========================================================
-// ==============  Reproducción secuencial  =================
-let currentSpeed = (() => {
-  const sc = document.getElementById("speedControl");
-  const val = sc ? parseFloat(sc.value) : NaN;
-  return Number.isFinite(val) ? val : 0.75;
-})();
-
-function reproducirSecuencialmente(lista) {
-    if (lista.length === 0) {
+// ==== Reproducción secuencial ====
+function reproducirSecuencial(lista) {
+    if(lista.length === 0){
         videoSeña.style.display = "none";
         return;
     }
 
     const path = lista.shift();
-    console.log("Reproduciendo:", path); // Verificación
     videoSource.src = path;
     videoSeña.load();
     videoSeña.style.display = "block";
     videoSeña.playbackRate = currentSpeed;
+    videoSeña.play();
 
     videoSeña.onended = () => {
-        setTimeout(() => reproducirSecuencialmente(lista), 100);
+        setTimeout(() => reproducirSecuencial(lista), 200);
     };
-    videoSeña.play();
 }
 
-// ==========================================================
-// =====================  Extras UI  ========================
-
-const speedControl = document.getElementById("speedControl");
-const speedValue = document.getElementById("speedValue");
-
-if (speedValue && speedControl) {
-  speedValue.textContent = parseFloat(speedControl.value) + "x";
-}
-
-speedControl.addEventListener("input", () => {
-  currentSpeed = parseFloat(speedControl.value);
-  videoSeña.playbackRate = currentSpeed;
-  speedValue.textContent = currentSpeed + "x";
-});
-
-function activarMicrofono() { boton.classList.add("mic-active"); }
-function desactivarMicrofono() { boton.classList.remove("mic-active"); }
-
-function mostrarTextoReconocido(textoReconocido) {
-  texto.textContent = textoReconocido;
-  texto.classList.add("glow");
-  setTimeout(() => texto.classList.remove("glow"), 1000);
-}
-
+// ==== Alto contraste ====
 const contrastToggle = document.getElementById("contrastToggle");
-contrastToggle.addEventListener("click", () => {
-  document.body.classList.toggle("high-contrast");
-});
+contrastToggle.addEventListener("click", () => document.body.classList.toggle("high-contrast"));
