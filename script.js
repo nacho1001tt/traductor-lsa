@@ -1,142 +1,128 @@
-// Elementos del DOM
-const boton = document.getElementById('start');
-const entradaTexto = document.getElementById('entradaTexto');
-const texto = document.getElementById('texto');
-const videoSeña = document.getElementById('videoSeña');
-const videoSource = document.getElementById('videoSource');
-const startText = document.getElementById('startText');
+// =============================
+// Utilidades de normalización
+// =============================
+function limpiarTexto(t) {
+  return (t || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // quita tildes
+    .replace(/[.,!?;:()"]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+const norm = s => limpiarTexto(s).replace(/\s+/g, ""); // sin espacios
 
-videoSeña.style.display = "none";
+// =============================
+// DOM
+// =============================
+const boton = document.getElementById("start");
+const entradaTexto = document.getElementById("entradaTexto");
+const texto = document.getElementById("texto");
+const video = document.getElementById("videoSena");   // <- id sin ñ
+const videoSource = document.getElementById("videoSource"); // no lo usamos para cargar (dejado por compat)
 
-// Configuración de velocidad
+video.style.display = "none";
+
+// Velocidad
 const speedControl = document.getElementById("speedControl");
 const speedValue = document.getElementById("speedValue");
 let currentSpeed = parseFloat(speedControl.value) || 0.75;
 speedValue.textContent = currentSpeed + "x";
-
 speedControl.addEventListener("input", () => {
-    currentSpeed = parseFloat(speedControl.value);
-    videoSeña.playbackRate = currentSpeed;
-    speedValue.textContent = currentSpeed + "x";
+  currentSpeed = parseFloat(speedControl.value);
+  video.playbackRate = currentSpeed;
+  speedValue.textContent = currentSpeed + "x";
 });
 
-// Micrófono activo/desactivo
-function activarMicrofono() { boton.classList.add("mic-active"); }
-function desactivarMicrofono() { boton.classList.remove("mic-active"); }
+// Mic
+function activarMicrofono(){ boton.classList.add("mic-active"); }
+function desactivarMicrofono(){ boton.classList.remove("mic-active"); }
 
-// Mostrar texto reconocido
+// Glow texto
 function mostrarTextoReconocido(t) {
-    texto.textContent = t;
-    texto.classList.add("glow");
-    setTimeout(() => texto.classList.remove("glow"), 1000);
+  texto.textContent = t;
+  texto.classList.add("glow");
+  setTimeout(() => texto.classList.remove("glow"), 700);
 }
 
-// ==== Reconocimiento de voz ====
-const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-reconocimiento.lang = 'es-ES';
+// Alto contraste
+document.getElementById("contrastToggle")
+  .addEventListener("click", () => document.body.classList.toggle("high-contrast"));
 
-boton.addEventListener('click', () => {
-    reconocimiento.start();
-    activarMicrofono();
-    if(startText) startText.textContent = "Escuchando...";
-});
-
-reconocimiento.onresult = (event) => {
-    const speechText = event.results[0][0].transcript;
+// =============================
+// SpeechRecognition (opcional)
+// =============================
+let reconocimiento = null;
+if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  reconocimiento = new SR();
+  reconocimiento.lang = "es-ES";
+  reconocimiento.onresult = (e) => {
+    const speechText = e.results[0][0].transcript || "";
     mostrarTextoReconocido(speechText);
-    procesarTextoSecuencial(speechText);
-};
-
-reconocimiento.onend = () => {
+    procesarTexto(speechText);
+  };
+  reconocimiento.onend = () => {
     desactivarMicrofono();
-    if(startText) startText.textContent = "Hablar";
-};
+    const st = document.getElementById("startText");
+    if (st) st.textContent = "Hablar";
+  };
+}
 
-// ==== Entrada de texto ====
-entradaTexto.addEventListener('keypress', (e) => {
-    if(e.key === "Enter") {
-        e.preventDefault();
-        const userInput = entradaTexto.value;
-        mostrarTextoReconocido(userInput);
-        procesarTextoSecuencial(userInput);
-    }
+boton.addEventListener("click", () => {
+  activarMicrofono();
+  const st = document.getElementById("startText");
+  if (st) st.textContent = "Escuchando...";
+  if (reconocimiento) reconocimiento.start();
 });
 
-// ==== Funciones de normalización de texto ====
-function limpiarTexto(texto) {
-    return texto
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"")
-        .replace(/[.,!?]/g,"")
-        .trim();
-}
+// Entrada texto
+entradaTexto.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const t = entradaTexto.value || "";
+    mostrarTextoReconocido(t);
+    procesarTexto(t);
+  }
+});
 
-// ==== Lista completa de palabras y verbos con conjugaciones ====
-const videos = {
-    "hablar": ["hablar","hablo","hablas","habla","hablamos","habláis","hablan","hablé","hablaste","habló","hablamos","hablasteis","hablaron","hablaré","hablarás","hablará","hablaremos","hablaréis","hablarán","hablando","hablado"],
-    "decir": ["decir","digo","dices","dice","decimos","decís","dicen","dije","dijiste","dijo","dijimos","dijisteis","dijeron","diré","dirás","dirá","diremos","diréis","dirán","diciendo","dicho"],
-    "contar o narrar": ["contar o narrar","cuento","cuentas","cuenta","contamos","contáis","cuentan","conté","contaste","contó","contamos","contasteis","contaron","contaré","contarás","contará","contaremos","contaréis","contarán","contando","contado"],
-    "estar": ["estar","estoy","estás","está","estamos","estáis","están","estuve","estuviste","estuvo","estuvimos","estuvisteis","estuvieron","estaré","estarás","estará","estaremos","estaréis","estarán","estando","estado"],
-    "explicar": ["explicar","explico","explicas","explica","explicamos","explicáis","explican","expliqué","explicaste","explicó","explicamos","explicasteis","explicaron","explicaré","explicarás","explicará","explicaremos","explicaréis","explicarán","explicando","explicado"],
-    "negar": ["negar","niego","niegas","niega","negamos","negáis","niegan","negué","negaste","negó","negamos","negasteis","negaron","negaré","negarás","negará","negaremos","negaréis","negarán","negando","negado"],
-    "apurar": ["apurar","apuro","apuras","apura","apuramos","apuráis","apuran","apuré","apuraste","apuró","apuramos","apurasteis","apuraron","apuraré","apurarás","apurará","apuraremos","apuraréis","apurarán","apurando","apurado"],
-    "llegar":["llegar","llego","llegas","llega","llegamos","llegáis","llegan","llegué","llegaste","llegó","llegamos","llegasteis","llegaron","llegaré","llegarás","llegará","llegaremos","llegaréis","llegarán","llegando","llegado"],
+// ==========================================
+// Mapeo de archivos EXACTOS y disparadores
+// ==========================================
 
-    // Pronombres, adverbios, sustantivos y letras
-    "no":["no"], "si":["si","sí"], "tambien":["tambien","también"], "tampoco":["tampoco"], "yo":["yo"], "vos":["vos"], "ustedes":["ustedes"], "nosotros o nosotras":["nosotros o nosotras"],
-    "a veces":["a veces"], "anteayer":["anteayer"], "ayer":["ayer"], "año pasado":["año pasado"], "año":["año"], "cerca":["cerca"], "como estas":["como estas","cómo estás"], "como quieras":["como quieras"], 
-    "comoestas":["comoestas"], "comotellamas":["comotellamas","cómo te llamas"], "derecha":["derecha"], "despacio":["despacio"], "después":["después"], "domingo":["domingo"], 
-    "enseguida":["enseguida"], "futuro":["futuro"], "hace poco":["hace poco"], "hasta":["hasta"], "hola":["hola"], "hora":["hora"], "hoy":["hoy"], "importante":["importante"], "izquierda":["izquierda"], 
-    "jamás":["jamás"], "jueves":["jueves"], "limpio":["limpio"], "llamoluana":["llamoluana"], "lo siento":["lo siento"], "lunes":["lunes"], "martes":["martes"], "mañana":["mañana"], "mediodía":["mediodía"], 
-    "mes":["mes"], "minuto":["minuto"], "miércoles":["miércoles"], "pasado":["pasado"], "primeravez":["primeravez"], "rápido":["rápido"], "sabado":["sabado"], "semana":["semana"], "siempre":["siempre"], 
-    "tarde":["tarde"], "temprano":["temprano"], "tiempo":["tiempo"], "todalanoche":["todalanoche"], "todavía":["todavía"], "todoslosdias":["todoslosdias"], "viernes":["viernes"], "último":["último"],
-    // Letras
-    "letraA":["letraA"], "letraB":["letraB"], "letraC":["letraC"], "letraCH":["letraCH"], "letraD":["letraD"], "letraE":["letraE"], "letraF":["letraF"], "letraG":["letraG"], "letraH":["letraH"], "letraI":["letraI"], "letraJ":["letraJ"], "letraK":["letraK"], "letraL":["letraL"], 
-    "letraLL":["letraLL"], "letraM":["letraM"], "letraN":["letraN"], "letraO":["letraO"], "letraP":["letraP"], "letraQ":["letraQ"], "letraR":["letraR"], "letraS":["letraS"], "letraT":["letraT"], "letraU":["letraU"], 
-    "letraV":["letraV"], "letraW":["letraW"], "letraX":["letraX"], "letraY":["letraY"], "letraZ":["letraZ"], "letraÑ":["letraÑ"]
-};
+// Lista EXACTA de archivos según tu carpeta
+const FILES = [
+  "Contar o Narrar.mp4","Decir.mp4","Dialogar.mp4","El o Ella.mp4","Estar.mp4","Explicar.mp4",
+  "Hablar.mp4","Lengua oral.mp4","Negar.mp4","No.mp4","Nosotros o Nosotras.mp4","Si.mp4",
+  "Tambien.mp4","Tampoco.mp4","Ustedes.mp4","Vos.mp4","Yo.mp4",
+  "a veces.mp4","anteayer.mp4","apurar.mp4","ayer.mp4","año pasado.mp4","año.mp4","cerca.mp4",
+  "como estas.mp4","como quieras.mp4","comoestas.mp4","comotellamas.mp4","derecha.mp4","despacio.mp4",
+  "después.mp4","domingo.mp4","enseguida.mp4","futuro.mp4","hace poco.mp4","hasta.mp4","hola.mp4",
+  "hora.mp4","hoy.mp4","importante.mp4","izquierda.mp4","jamás.mp4","jueves.mp4",
+  "letraA.mp4","letraB.mp4","letraC.mp4","letraCH.mp4","letraD.mp4","letraE.mp4","letraF.mp4","letraG.mp4",
+  "letraH.mp4","letraI.mp4","letraJ.mp4","letraK.mp4","letraL.mp4","letraLL.mp4","letraM.mp4",
+  "letraN.mp4","letraO.mp4","letraP.mp4","letraQ.mp4","letraR.mp4","letraS.mp4","letraT.mp4",
+  "letraU.mp4","letraV.mp4","letraW.mp4","letraX.mp4","letraY.mp4","letraZ.mp4","letraÑ.mp4",
+  "limpio.mp4","llamoluana.mp4","llegar.mp4","lo siento.mp4","lunes.mp4","martes.mp4","mañana.mp4",
+  "mediodía.mp4","mes.mp4","minuto.mp4","miércoles.mp4","pasado.mp4","primeravez.mp4","rápido.mp4",
+  "sabado.mp4","semana.mp4","siempre.mp4","tarde.mp4","temprano.mp4","tiempo.mp4","todalanoche.mp4",
+  "todavía.mp4","todoslosdias.mp4","viernes.mp4","último.mp4"
+];
 
-// ==== Función principal ====
-function procesarTextoSecuencial(textoRaw) {
-    if(!textoRaw) return;
+// Diccionario de disparadores → archivo
+// Clave SIEMPRE normalizada sin espacios ni acentos (norm(...))
+const MAP = new Map();
 
-    const text = limpiarTexto(textoRaw);
-    const palabras = text.split(" ").filter(p => p.trim() !== "");
+// Helper para registrar
+function addTrigger(trigger, filename) { MAP.set(norm(trigger), filename); }
 
-    const videosAReproducir = [];
+// Palabras/Frases sueltas (no verbos)
+addTrigger("hola","hola.mp4");
+addTrigger("si","Si.mp4"); addTrigger("sí","Si.mp4");
+addTrigger("no","No.mp4");
+addTrigger("tambien","Tambien.mp4"); addTrigger("también","Tambien.mp4");
+addTrigger("tampoco","Tampoco.mp4");
 
-    palabras.forEach(p => {
-        for(const key in videos){
-            if(videos[key].includes(p)){
-                videosAReproducir.push(`Palabras/${encodeURIComponent(key)}.mp4`);
-                break;
-            }
-        }
-    });
-
-    reproducirSecuencial(videosAReproducir);
-}
-
-// ==== Reproducción secuencial ====
-function reproducirSecuencial(lista) {
-    if(lista.length === 0){
-        videoSeña.style.display = "none";
-        return;
-    }
-
-    const path = lista.shift();
-    videoSource.src = path;
-    videoSeña.load();
-    videoSeña.style.display = "block";
-    videoSeña.playbackRate = currentSpeed;
-    videoSeña.play();
-
-    videoSeña.onended = () => {
-        setTimeout(() => reproducirSecuencial(lista), 200);
-    };
-}
-
-// ==== Alto contraste ====
-const contrastToggle = document.getElementById("contrastToggle");
-contrastToggle.addEventListener("click", () => document.body.classList.toggle("high-contrast"));
+addTrigger("yo","Yo.mp4");
+addTrigger("vos","Vos.mp4");
+addTrigger("ustedes","
