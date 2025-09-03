@@ -8,19 +8,21 @@ const texto = document.getElementById('texto');
 const videoSeña = document.getElementById('videoSeña');
 const videoSource = document.getElementById('videoSource');
 const entradaTexto = document.getElementById('entradaTexto');
-const startText = document.getElementById('startText'); // Texto del botón
+const startText = document.getElementById('startText');
 
 // Ocultar el video al cargar la página
 videoSeña.style.display = "none";
 
-// Configuramos el reconocimiento de voz
+// ==========================================================
+// ==================  Configuración de voz =================
+// ==========================================================
 const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-reconocimiento.lang = 'es-ES'; // Idioma español
+reconocimiento.lang = 'es-ES';
 
 boton.addEventListener('click', () => {
-    activarMicrofono();                    // Enciende indicador
-    if (startText) startText.textContent = "Escuchando..."; // Cambia texto del botón
-    reconocimiento.start();                // Inicia el reconocimiento de voz
+    activarMicrofono();
+    if (startText) startText.textContent = "Escuchando...";
+    reconocimiento.start();
 });
 
 reconocimiento.onresult = (event) => {
@@ -29,10 +31,9 @@ reconocimiento.onresult = (event) => {
     procesarTextoSecuencial(speechText);
 };
 
-// Apaga el indicador cuando finaliza el reconocimiento
 reconocimiento.onend = () => {
     desactivarMicrofono();
-    if (startText) startText.textContent = "Hablar"; // Restaura texto del botón
+    if (startText) startText.textContent = "Hablar";
 };
 
 entradaTexto.addEventListener('keypress', (event) => {
@@ -45,9 +46,7 @@ entradaTexto.addEventListener('keypress', (event) => {
 });
 
 // ==========================================================
-// ===============  Conjugaciones por verbo  =================
-// (mantenemos el mismo formato que ya usabas)
-// ==========================================================
+// ==================  Conjugaciones por verbo  =================
 const conjugaciones = {
     dialogar: [
         "dialogar", "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
@@ -102,12 +101,10 @@ const conjugaciones = {
         "estaré", "estarás", "estará", "estaremos", "estarán",
         "estando", "estado", "he estado", "hemos estado", "han estado"
     ],
-
-    // ===== Verbos nuevos detectados en tu carpeta =====
     apurar: [
         "apurar", "apuro", "apurás", "apuras", "apura", "apuramos", "apuran",
         "apuré", "apuraste", "apuró", "apuramos", "apuraron",
-        "apuraba", "apurabas", "apurábamos", "apuraban",
+        "apuraba", "aprabas", "apurábamos", "apuraban",
         "apuraré", "apurarás", "apurará", "apuraremos", "apurarán",
         "apuraría", "apurarías", "apuraríamos", "apurarían",
         "apurando", "apurado", "he apurado", "hemos apurado", "han apurado"
@@ -117,17 +114,13 @@ const conjugaciones = {
         "llegué", "llegaste", "llegó", "llegamos", "llegaron",
         "llegaba", "llegabas", "llegábamos", "llegaban",
         "llegaré", "llegarás", "llegará", "llegaremos", "llegarán",
-        "llegaría", "llegarías", "llegaríamos", "llegarían",
         "llegando", "llegado", "he llegado", "hemos llegado", "han llegado"
     ]
 };
 
 // ==========================================================
-// ==================  Palabras fijas  =======================
-// (incluye nuevas de la carpeta; se agregan variantes sin tilde)
-// ==========================================================
+// ====================  Palabras fijas =====================
 const palabrasFijas = {
-    // Ya existentes
     "lengua oral": "Lengua oral",
     si: "Si", "sí": "Si",
     no: "No",
@@ -141,9 +134,7 @@ const palabrasFijas = {
     "ella": "El o Ella",
     "nosotros": "Nosotros o Nosotras",
     "nosotras": "Nosotros o Nosotras",
-
-    // ===== Nuevas palabras/expresiones (según tu carpeta) =====
-    // Tiempo / frecuencia
+    // Nuevas
     "ayer": "ayer",
     "hoy": "hoy",
     "mañana": "mañana", "manana": "mañana",
@@ -171,33 +162,21 @@ const palabrasFijas = {
     "temprano": "temprano",
     "tarde": "tarde",
     "hasta": "hasta",
-
-    // Lugar / direcciones / cualidades
     "cerca": "cerca",
     "derecha": "derecha",
     "izquierda": "izquierda",
     "importante": "importante",
     "limpio": "limpio",
-
-    // Días y frases sociales
-    "hola": "hola",
-    "no": "No",
-    "si": "Si", "sí": "Si",
-
-    // ¡Ojo! Las frases multi-palabra se manejan abajo con includes(),
-    // pero igual ponemos aquí las formas de UNA palabra para que
-    // funcionen si vienen sueltas.
+    "hola": "hola"
 };
 
 // ==========================================================
-// =========  Procesamiento secuencial (con frases) =========
-// ==========================================================
+// ==========  Procesamiento secuencial de texto ===========
 function procesarTextoSecuencial(text) {
     const palabras = text.split(" ");
     const videosAReproducir = [];
 
-    // ---- Frases fijas (multi-palabra) ----
-    // Mantengo tus existentes y agrego las nuevas vistas en la carpeta
+    // Frases completas
     if (text.includes("como estas") || text.includes("cómo estás")) {
         videosAReproducir.push("Palabras/comoestas.mp4");
     }
@@ -207,7 +186,6 @@ function procesarTextoSecuencial(text) {
     if (text.includes("me llamo luana")) {
         videosAReproducir.push("Palabras/llamoluana.mp4");
     }
-    // Nuevas:
     if (text.includes("como quieres") || text.includes("cómo quieres")) {
         videosAReproducir.push("Palabras/como quieres.mp4");
     }
@@ -233,85 +211,41 @@ function procesarTextoSecuencial(text) {
         videosAReproducir.push("Palabras/año pasado.mp4");
     }
 
-    // ---- Palabras individuales ----
-    for (let palabra of palabras) {
-        palabra = palabra.trim();
-
-        // Saludos simples
-        if (palabra === "hola") {
-            videosAReproducir.push("Palabras/hola.mp4");
-            continue;
-        }
+    // Palabras individuales
+    palabras.forEach(palabraRaw => {
+        let palabra = palabraRaw.trim();
 
         // Letras
         const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
         if (letras.includes(palabra)) {
             videosAReproducir.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
-            continue;
+            return;
         }
 
-        // Verbo conjugado
+        // Verbos
         for (let verbo in conjugaciones) {
             if (conjugaciones[verbo].includes(palabra)) {
-                const nombreArchivo = (verbo === "contar" || verbo === "narrar")
-                    ? "Contar o Narrar"
-                    : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+                const nombreArchivo = (verbo === "contar" || verbo === "narrar") ? "Contar o Narrar" : verbo.charAt(0).toUpperCase() + verbo.slice(1);
                 videosAReproducir.push(`Palabras/${nombreArchivo}.mp4`);
-                break;
+                return;
             }
         }
 
-        // Palabras fijas sueltas (una sola palabra)
+        // Palabras fijas
         for (let fija in palabrasFijas) {
             if (palabra === fija) {
                 videosAReproducir.push(`Palabras/${palabrasFijas[fija]}.mp4`);
-                break;
+                return;
             }
         }
-
-        // Casos de una sola palabra que están como archivo exacto:
-        // (por si vienen así en el texto y no entran en 'palabrasFijas')
-        const archivosUnaPalabra = [
-            "ayer","hoy","mañana","manana","futuro","pasado","ultimo","último",
-            "minuto","hora","mes","semana","domingo","lunes","martes",
-            "miercoles","miércoles","jueves","viernes","sabado","sábado",
-            "mediodia","mediodía","todavia","todavía","siempre","rapido","rápido",
-            "despacio","temprano","tarde","cerca","derecha","izquierda",
-            "importante","limpio"
-        ];
-        if (archivosUnaPalabra.includes(palabra)) {
-            // Normalizamos a los nombres de archivo que vi en tu carpeta
-            const normalizaciones = {
-                "manana":"mañana", "miercoles":"miercoles", "miércoles":"miercoles",
-                "sabado":"sabado", "sábado":"sabado",
-                "mediodía":"mediodia", "todavía":"todavia",
-                "rápido":"rapido", "último":"ultimo"
-            };
-            const nombre = normalizaciones[palabra] || palabra;
-            videosAReproducir.push(`Palabras/${nombre}.mp4`);
-            continue;
-        }
-
-        // Variantes de "anteayer"
-        if (palabra === "anteayer" || palabra === "antayer") {
-            videosAReproducir.push("Palabras/antayer.mp4"); // según tu captura
-            continue;
-        }
-    }
+    });
 
     reproducirSecuencialmente(videosAReproducir);
 }
 
 // ==========================================================
 // ==============  Reproducción secuencial  =================
-// ==========================================================
-
-// ====== Velocidad global (fix) ======
-let currentSpeed = (() => {
-  const sc = document.getElementById("speedControl");
-  const val = sc ? parseFloat(sc.value) : NaN;
-  return Number.isFinite(val) ? val : 0.75;
-})();
+let currentSpeed = parseFloat(document.getElementById("speedControl").value) || 0.75;
 
 function reproducirSecuencialmente(lista) {
     if (lista.length === 0) {
@@ -323,54 +257,33 @@ function reproducirSecuencialmente(lista) {
     videoSource.src = path;
     videoSeña.load();
     videoSeña.style.display = "block";
-
-    // ✅ Usar la velocidad actual elegida por el usuario (no pisar con 0.75)
     videoSeña.playbackRate = currentSpeed;
 
+    videoSeña.play().catch(err => {
+        console.warn("Video bloqueado hasta interacción del usuario:", err);
+    });
+
     videoSeña.onended = () => {
-        setTimeout(() => {
-            reproducirSecuencialmente(lista);
-        }, 100); // delay de 100ms
+        reproducirSecuencialmente(lista);
     };
-    videoSeña.play();
 }
 
 // ==========================================================
-// =====================  Extras UI  ========================
-// ==========================================================
-
-// 🎚 Control de velocidad
-const speedControl = document.getElementById("speedControl");
-const speedValue = document.getElementById("speedValue");
-
-// Sincronizar la etiqueta al cargar
-if (speedValue && speedControl) {
-  speedValue.textContent = parseFloat(speedControl.value) + "x";
-}
-
-speedControl.addEventListener("input", () => {
-  currentSpeed = parseFloat(speedControl.value);   // actualizar velocidad global
-  videoSeña.playbackRate = currentSpeed;           // aplicar de inmediato si está reproduciendo
-  speedValue.textContent = currentSpeed + "x";
+// ==================  Velocidad de reproducción  ===========
+document.getElementById("speedControl").addEventListener("input", (e) => {
+    currentSpeed = parseFloat(e.target.value);
 });
 
-// 🎤 Indicador de micrófono
+// ==========================================================
+// ==================  Funciones auxiliares =================
+function mostrarTextoReconocido(text) {
+    if (texto) texto.textContent = text;
+}
+
 function activarMicrofono() {
-  boton.classList.add("mic-active");
+    boton.disabled = true;
 }
+
 function desactivarMicrofono() {
-  boton.classList.remove("mic-active");
+    boton.disabled = false;
 }
-
-// ✨ Glow en el texto cuando hay input
-function mostrarTextoReconocido(textoReconocido) {
-  texto.textContent = textoReconocido;
-  texto.classList.add("glow");
-  setTimeout(() => texto.classList.remove("glow"), 1000);
-}
-
-// ♿ Toggle de alto contraste
-const contrastToggle = document.getElementById("contrastToggle");
-contrastToggle.addEventListener("click", () => {
-  document.body.classList.toggle("high-contrast");
-});
