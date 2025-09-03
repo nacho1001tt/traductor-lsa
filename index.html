@@ -2,24 +2,30 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Reproducción de Señas</title>
+<title>Sign Language Player</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-  #texto { font-size: 1.5em; margin-bottom: 20px; }
-  video { max-width: 80%; margin-top: 20px; }
+  body.high-contrast { background-color: black; color: yellow; }
+  #texto.glow { text-shadow: 0 0 10px yellow; }
+  video { width: 600px; max-width: 100%; }
+  #start.mic-active { background-color: green; color: white; }
 </style>
 </head>
 <body>
 
-<h1>Reconocimiento de Voz a Señas</h1>
+<h1>Sign Language Player</h1>
 
-<div id="texto">Texto reconocido aparecerá aquí</div>
-
-<input type="text" id="entradaTexto" placeholder="Escribe algo y presiona Enter" />
-
-<button id="start">🎤 Hablar</button>
+<button id="start"><span id="startText">Hablar</span></button>
+<input type="text" id="entradaTexto" placeholder="Escribe aquí...">
+<div id="texto"></div>
 
 <video id="videoSeña" controls>
   <source id="videoSource" src="" type="video/mp4">
-  Tu navegador no soporta HTML5 video.
+  Tu navegador no soporta videos.
 </video>
+
+<br>
+<label>Velocidad: <span id="speedValue">0.75x</span></label>
+<input type="range" id="speedControl" min="0.25" max="2" step="0.05" value="0.75">
+
+<br>
+<button id="contrastToggle">Alto Contraste</button>
