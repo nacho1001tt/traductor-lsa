@@ -1,47 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traductor de Voz y Texto a Lengua de Señas</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traductor de Voz y Texto a Lengua de Señas</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <header>
     <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
+    <button id="contrastToggle">Alto Contraste</button>
+  </header>
 
-    <button id="start">Hablar</button>
-
-    <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
-    <p id="texto"></p>
-
-    <!-- Video centrado -->
-    <div id="videoContainer">
-        <video id="videoSeña" controls>
-            <source id="videoSource" src="" type="video/mp4">
-            Tu navegador no soporta la reproducción de videos.
-        </video>
+  <main>
+    <div class="controls">
+      <button id="start">
+        <span class="mic-indicator"></span>
+        Hablar
+      </button>
+      <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
     </div>
 
-    <!-- Información sobre el proyecto -->
-    <footer id="infoProyecto">
-        <h2>Información sobre el proyecto</h2>
-        <p>Somos un grupo de estudiantes comprometidos con la inclusión.  
-        Nuestro objetivo fue desarrollar un traductor de voz y texto a lengua de señas para mejorar la comunicación.  
-        </p>
-        <ul>
-            <li><b>Integrante 1:</b> Investigación y recopilación de videos</li>
-            <li><b>Integrante 2:</b> Programación en JavaScript</li>
-            <li><b>Integrante 3:</b> Diseño y maquetado de la página</li>
-            <li><b>Integrante 4:</b> Integración y pruebas</li>
-        </ul>
-    </footer>
+    <p id="texto"></p>
 
-    <script src="script.js"></script>
-    <script>
-        // Ajustar velocidad de reproducción a 0.75
-        const video = document.getElementById("videoSeña");
-        video.playbackRate = 0.75;
-    </script>
+    <div class="video-container">
+      <video id="videoSeña" controls>
+        <source id="videoSource" src="" type="video/mp4">
+        Tu navegador no soporta la reproducción de videos.
+      </video>
+      <div class="video-speed">
+        <label for="speedControl">Velocidad: </label>
+        <input type="range" id="speedControl" min="0.5" max="1.5" step="0.25" value="0.75">
+        <span id="speedValue">0.75x</span>
+      </div>
+    </div>
+
+    <section id="infoProyecto">
+      <h2>Información sobre el proyecto</h2>
+      <p>
+        Somos un grupo de estudiantes interesados en aportar nuestro grano de arena a la inclusión de personas con pérdida auditiva. 
+        Nuestro objetivo fue desarrollar un traductor de voz y texto a lengua de señas para mejorar la comunicación y el aprendizaje.
+      </p>
+      <ul>
+        <li><strong>Luana Vázquez:</strong> Intérprete, la cara más visible del proyecto</li>
+        <li><strong>Fernando Vázquez:</strong> Conocimiento previo sobre el lenguaje de señas</li>
+        <li><strong>Ignacio Vergara:</strong> Programador y diseñador de la página web</li>
+      </ul>
+    </section>
+
+    <section id="infoCultural">
+      <h2>Importancia de la lengua de señas</h2>
+      <p>
+        La lengua de señas es un idioma completo que permite a millones de personas sordas comunicarse, aprender y expresarse. 
+        Reconocer y respetar la lengua de señas es esencial para construir una sociedad más inclusiva y equitativa. 
+        Este traductor busca ser un puente hacia la accesibilidad.
+      </p>
+      <p>
+        Respetar la cultura sorda significa valorar su identidad, tradiciones y la riqueza de su idioma visual.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Proyecto Inclusión – Todos los derechos reservados</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
