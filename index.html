@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traductor de Voz y Texto a Lengua de Señas</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <div class="overlay"></div> <!-- 🔹 Overlay para mejorar contraste -->
+  <div class="overlay"></div>
 
   <header>
     <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
@@ -21,19 +21,22 @@
         <span class="mic-indicator"></span>
         <span id="startText">Hablar</span>
       </button>
-      <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
+      <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí..."/>
     </div>
 
     <p id="texto"></p>
 
     <div class="video-container">
-      <video id="videoSeña" controls>
-        <source id="videoSource" src="" type="video/mp4">
+      <!-- Importante: id sin ñ/tildes, y muted/playsinline para evitar bloqueos -->
+      <video id="videoSena" controls muted playsinline>
+        <!-- dejamos el <source> vacío, pero el JS cargará en video.src directamente -->
+        <source id="videoSource" src="" type="video/mp4"/>
         Tu navegador no soporta la reproducción de videos.
       </video>
+
       <div class="video-speed">
         <label for="speedControl">Velocidad: </label>
-        <input type="range" id="speedControl" min="0.5" max="1.5" step="0.25" value="0.75">
+        <input type="range" id="speedControl" min="0.5" max="1.5" step="0.25" value="0.75"/>
         <span id="speedValue">0.75x</span>
       </div>
     </div>
