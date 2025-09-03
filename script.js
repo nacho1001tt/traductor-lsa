@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const videoSource = document.getElementById('videoSource');
   const entradaTexto = document.getElementById('entradaTexto');
 
+  // 🔊 Silenciar video para que el navegador permita reproducir automáticamente
+videoSeña.muted = true;
+
+// Ocultar el video al cargar la página
+videoSeña.style.display = "none";
+  
   // slider de velocidad (si existe en tu HTML)
   const speedControl = document.getElementById('speedControl'); // <input type="range" id="speedControl" ...>
   const speedValue = document.getElementById('speedValue');     // <span id="speedValue">0.75x</span>
