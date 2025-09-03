@@ -109,7 +109,7 @@ function procesarTextoSecuencial(textoRaw) {
     palabras.forEach(p => {
         for(const key in videos){
             if(videos[key].includes(p)){
-                videosAReproducir.push(`Palabras/${key.replace(/ /g,"%20")}.mp4`);
+                videosAReproducir.push(`Palabras/${encodeURIComponent(key)}.mp4`);
                 break;
             }
         }
