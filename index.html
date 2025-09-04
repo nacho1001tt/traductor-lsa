@@ -8,6 +8,8 @@
 </head>
 <body>
 
+  <div class="overlay"></div> <!-- 🔹 Overlay para mejorar contraste -->
+
   <header>
     <h1>Traductor de Voz y Texto a Lengua de Señas</h1>
     <button id="contrastToggle">Alto Contraste</button>
@@ -17,7 +19,7 @@
     <div class="controls">
       <button id="start">
         <span class="mic-indicator"></span>
-        Hablar
+        <span id="startText">Hablar</span>
       </button>
       <input type="text" id="entradaTexto" placeholder="Escribe una palabra aquí...">
     </div>

@@ -1,100 +1,61 @@
-// script.js - Versión completa con manejo de .play().catch()
-// Mantuvimos exactamente tus conjugaciones, rutas "Palabras/..." y la estructura.
+// ==========================================================
+// ==============  Traductor Voz/Text → Señas  ==============
+// ==========================================================
 
-document.addEventListener('DOMContentLoaded', () => {
+// Capturamos los elementos del HTML
+const boton = document.getElementById('start');
+const texto = document.getElementById('texto');
+const videoSeña = document.getElementById('videoSeña');
+const videoSource = document.getElementById('videoSource');
+const entradaTexto = document.getElementById('entradaTexto');
+const startText = document.getElementById('startText'); // Texto del botón
 
-  // --- Elementos del DOM ---
-  const boton = document.getElementById('start');
-  const texto = document.getElementById('texto');
-  const videoSeña = document.getElementById('videoSeña');
-  const videoSource = document.getElementById('videoSource');
-  const entradaTexto = document.getElementById('entradaTexto');
-  const speedControl = document.getElementById('speedControl'); // opcional
-  const speedValue = document.getElementById('speedValue');     // opcional
-  const contrastToggle = document.getElementById('contrastToggle'); // opcional
+// Ocultar el video al cargar la página
+videoSeña.style.display = "none";
 
-  // Verificación mínima
-  if (!boton || !texto || !videoSeña || !videoSource || !entradaTexto) {
-    console.error('Faltan elementos HTML requeridos (start, texto, videoSeña, videoSource, entradaTexto).');
-    // no abortamos por completo para permitir pruebas parciales
-  }
+// Configuramos el reconocimiento de voz
+const reconocimiento = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+reconocimiento.lang = 'es-ES'; // Idioma español
 
-  // 🔊 Silenciar video para intentar permitir autoplay en navegadores que lo permiten
-  try { videoSeña.muted = true; } catch(e){ /* noop */ }
+boton.addEventListener('click', () => {
+    activarMicrofono();                    // Enciende indicador
+    if (startText) startText.textContent = "Escuchando..."; // Cambia texto del botón
+    reconocimiento.start();                // Inicia el reconocimiento de voz
+});
 
-  // Ocultar el video al inicio
-  videoSeña.style.display = "none";
+reconocimiento.onresult = (event) => {
+    const speechText = event.results[0][0].transcript.toLowerCase();
+    mostrarTextoReconocido(speechText);
+    procesarTextoSecuencial(speechText);
+};
 
-  // Velocidad por defecto
-  const DEFAULT_SPEED = 0.75;
-  if (speedControl) {
-    if (!speedControl.value) speedControl.value = DEFAULT_SPEED;
-    if (speedValue) speedValue.textContent = speedControl.value + "x";
-    speedControl.addEventListener('input', () => {
-      const s = parseFloat(speedControl.value) || DEFAULT_SPEED;
-      videoSeña.playbackRate = s;
-      if (speedValue) speedValue.textContent = s + "x";
-    });
-  } else {
-    videoSeña.playbackRate = DEFAULT_SPEED;
-  }
+// Apaga el indicador cuando finaliza el reconocimiento
+reconocimiento.onend = () => {
+    desactivarMicrofono();
+    if (startText) startText.textContent = "Hablar"; // Restaura texto del botón
+};
 
-  // Toggle alto contraste (si existe)
-  if (contrastToggle) {
-    contrastToggle.addEventListener('click', () => {
-      document.body.classList.toggle('high-contrast');
-    });
-  }
-
-  // --- Reconocimiento de voz ---
-  const Recon = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const reconocimiento = Recon ? new Recon() : null;
-  if (!Recon) {
-    console.warn('SpeechRecognition no disponible en este navegador. Solo entrada por texto funcionará.');
-  } else {
-    reconocimiento.lang = 'es-ES';
-    reconocimiento.onstart = () => boton.classList.add('mic-active');
-    reconocimiento.onend = () => boton.classList.remove('mic-active');
-
-    reconocimiento.onresult = (event) => {
-      try {
-        const speechText = event.results[0][0].transcript.toLowerCase();
-        mostrarTextoReconocido(speechText);
-        procesarTextoSecuencial(speechText);
-      } catch (err) {
-        console.error('Error procesando resultado de reconocimiento:', err);
-      }
-    };
-  }
-
-  boton.addEventListener('click', () => {
-    if (!reconocimiento) {
-      alert('Reconocimiento de voz no disponible en este navegador.');
-      return;
-    }
-    try { reconocimiento.start(); }
-    catch (err) { console.error('No se pudo iniciar reconocimiento:', err); }
-  });
-
-  // Tecla Enter en input
-  entradaTexto.addEventListener('keypress', (event) => {
+entradaTexto.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
-      event.preventDefault();
-      const userInput = entradaTexto.value.toLowerCase().trim();
-      mostrarTextoReconocido(userInput);
-      procesarTextoSecuencial(userInput);
+        event.preventDefault();
+        const userInput = entradaTexto.value.toLowerCase();
+        mostrarTextoReconocido(userInput);
+        procesarTextoSecuencial(userInput);
     }
-  });
+});
 
-  // --- Tus conjugaciones (idénticas a las que proporcionaste) ---
-  const conjugaciones = {
+// ==========================================================
+// ===============  Conjugaciones por verbo  =================
+// (mantenemos el mismo formato que ya usabas)
+// ==========================================================
+const conjugaciones = {
     dialogar: [
         "dialogar", "dialogo", "dialogás", "dialogas", "dialoga", "dialogamos", "dialogan",
         "dialogué", "dialogaste", "dialogó", "dialogamos", "dialogaron",
         "dialogaba", "dialogabas", "dialogábamos", "dialogaban",
         "dialogaré", "dialogarás", "dialogará", "dialogaremos", "dialogarán",
         "dialogaría", "dialogarías", "dialogaríamos", "dialogarían",
-        "dialogando", "dialogado", "dialogaré", "he dialogado", "hemos dialogado", "han dialogado"
+        "dialogando", "dialogado", "he dialogado", "hemos dialogado", "han dialogado"
     ],
     hablar: [
         "hablar", "hablo", "hablás", "hablas", "habla", "hablamos", "hablan",
@@ -140,16 +101,38 @@ document.addEventListener('DOMContentLoaded', () => {
         "estaba", "estabas", "estábamos", "estaban",
         "estaré", "estarás", "estará", "estaremos", "estarán",
         "estando", "estado", "he estado", "hemos estado", "han estado"
-    ]
-  };
+    ],
 
-  // Palabras fijas
-  const palabrasFijas = {
+    // ===== Verbos nuevos detectados en tu carpeta =====
+    apurar: [
+        "apurar", "apuro", "apurás", "apuras", "apura", "apuramos", "apuran",
+        "apuré", "apuraste", "apuró", "apuramos", "apuraron",
+        "apuraba", "apurabas", "apurábamos", "apuraban",
+        "apuraré", "apurarás", "apurará", "apuraremos", "apurarán",
+        "apuraría", "apurarías", "apuraríamos", "apurarían",
+        "apurando", "apurado", "he apurado", "hemos apurado", "han apurado"
+    ],
+    llegar: [
+        "llegar", "llego", "llegás", "llegas", "llega", "llegamos", "llegan",
+        "llegué", "llegaste", "llegó", "llegamos", "llegaron",
+        "llegaba", "llegabas", "llegábamos", "llegaban",
+        "llegaré", "llegarás", "llegará", "llegaremos", "llegarán",
+        "llegaría", "llegarías", "llegaríamos", "llegarían",
+        "llegando", "llegado", "he llegado", "hemos llegado", "han llegado"
+    ]
+};
+
+// ==========================================================
+// ==================  Palabras fijas  =======================
+// (incluye nuevas de la carpeta; se agregan variantes sin tilde)
+// ==========================================================
+const palabrasFijas = {
+    // Ya existentes
     "lengua oral": "Lengua oral",
-    si: "Si",
+    si: "Si", "sí": "Si",
     no: "No",
     negar: "Negar",
-    también: "Tambien",
+    también: "Tambien", "tambien": "Tambien",
     tampoco: "Tampoco",
     yo: "Yo",
     vos: "Vos",
@@ -157,143 +140,237 @@ document.addEventListener('DOMContentLoaded', () => {
     "el": "El o Ella",
     "ella": "El o Ella",
     "nosotros": "Nosotros o Nosotras",
-    "nosotras": "Nosotros o Nosotras"
-  };
+    "nosotras": "Nosotros o Nosotras",
 
-  // --- Funciones auxiliares ---
-  function mostrarTextoReconocido(str) {
-    texto.textContent = str || '';
-    texto.classList.add('glow');
-    setTimeout(() => texto.classList.remove('glow'), 900);
-  }
+    // ===== Nuevas palabras/expresiones (según tu carpeta) =====
+    // Tiempo / frecuencia
+    "ayer": "ayer",
+    "hoy": "hoy",
+    "mañana": "mañana", "manana": "mañana",
+    "año": "año", "ano": "año",
+    "año pasado": "año pasado", "ano pasado": "año pasado",
+    "futuro": "futuro",
+    "pasado": "pasado",
+    "último": "ultimo", "ultimo": "ultimo",
+    "minuto": "minuto",
+    "hora": "hora",
+    "mes": "mes",
+    "semana": "semana",
+    "domingo": "domingo",
+    "lunes": "lunes",
+    "martes": "martes",
+    "miércoles": "miercoles", "miercoles": "miercoles",
+    "jueves": "jueves",
+    "viernes": "viernes",
+    "sábado": "sabado", "sabado": "sabado",
+    "mediodía": "mediodia", "mediodia": "mediodia",
+    "todavía": "todavia", "todavia": "todavia",
+    "siempre": "siempre",
+    "rápido": "rapido", "rapido": "rapido",
+    "despacio": "despacio",
+    "temprano": "temprano",
+    "tarde": "tarde",
+    "hasta": "hasta",
 
-  // --- Procesar texto y armar lista de videos ---
-  function procesarTextoSecuencial(text) {
-    if (!text || !text.trim()) {
-      console.log('Texto vacío - nada que reproducir.');
-      return;
-    }
+    // Lugar / direcciones / cualidades
+    "cerca": "cerca",
+    "derecha": "derecha",
+    "izquierda": "izquierda",
+    "importante": "importante",
+    "limpio": "limpio",
 
-    // separar por espacios/puntuación
-    const palabras = text.split(/[\s,;?.!¡¿]+/).filter(Boolean);
+    // Días y frases sociales
+    "hola": "hola",
+    "no": "No",
+    "si": "Si", "sí": "Si",
+
+    // ¡Ojo! Las frases multi-palabra se manejan abajo con includes(),
+    // pero igual ponemos aquí las formas de UNA palabra para que
+    // funcionen si vienen sueltas.
+};
+
+// ==========================================================
+// =========  Procesamiento secuencial (con frases) =========
+// ==========================================================
+function procesarTextoSecuencial(text) {
+    const palabras = text.split(" ");
     const videosAReproducir = [];
 
-    // para detecciones de frases
-    const fraseLower = text.toLowerCase();
+    // ---- Frases fijas (multi-palabra) ----
+    // Mantengo tus existentes y agrego las nuevas vistas en la carpeta
+    if (text.includes("como estas") || text.includes("cómo estás")) {
+        videosAReproducir.push("Palabras/comoestas.mp4");
+    }
+    if (text.includes("vos cómo te llamas") || text.includes("cómo te llamas")) {
+        videosAReproducir.push("Palabras/comotellamas.mp4");
+    }
+    if (text.includes("me llamo luana")) {
+        videosAReproducir.push("Palabras/llamoluana.mp4");
+    }
+    // Nuevas:
+    if (text.includes("como quieres") || text.includes("cómo quieres")) {
+        videosAReproducir.push("Palabras/como quieres.mp4");
+    }
+    if (text.includes("lo siento")) {
+        videosAReproducir.push("Palabras/lo siento.mp4");
+    }
+    if (text.includes("hace poco")) {
+        videosAReproducir.push("Palabras/hace poco.mp4");
+    }
+    if (text.includes("a veces")) {
+        videosAReproducir.push("Palabras/a veces.mp4");
+    }
+    if (text.includes("toda la noche")) {
+        videosAReproducir.push("Palabras/toda la noche.mp4");
+    }
+    if (text.includes("todos los dias") || text.includes("todos los días")) {
+        videosAReproducir.push("Palabras/todos los dias.mp4");
+    }
+    if (text.includes("primera vez")) {
+        videosAReproducir.push("Palabras/primera vez.mp4");
+    }
+    if (text.includes("año pasado") || text.includes("ano pasado")) {
+        videosAReproducir.push("Palabras/año pasado.mp4");
+    }
 
+    // ---- Palabras individuales ----
     for (let palabra of palabras) {
-      palabra = palabra.trim().toLowerCase();
-      if (!palabra) continue;
+        palabra = palabra.trim();
 
-      // Frases y expresiones (prioritarias)
-      if (palabra === "hola") {
-        videosAReproducir.push("Palabras/hola.mp4");
-        continue;
-      }
-      if (fraseLower.includes("como estas") || fraseLower.includes("cómo estás")) {
-        if (!videosAReproducir.includes("Palabras/comoestas.mp4")) videosAReproducir.push("Palabras/comoestas.mp4");
-      }
-      if (fraseLower.includes("vos cómo te llamas") || fraseLower.includes("cómo te llamas")) {
-        if (!videosAReproducir.includes("Palabras/comotellamas.mp4")) videosAReproducir.push("Palabras/comotellamas.mp4");
-      }
-      if (fraseLower.includes("me llamo luana")) {
-        if (!videosAReproducir.includes("Palabras/llamoluana.mp4")) videosAReproducir.push("Palabras/llamoluana.mp4");
-      }
-
-      // Letras
-      const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
-      if (letras.includes(palabra)) {
-        videosAReproducir.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
-        continue;
-      }
-
-      // Conjugaciones / verbos
-      let encontrado = false;
-      for (let verbo in conjugaciones) {
-        if (conjugaciones[verbo].includes(palabra)) {
-          const nombreArchivo = (verbo === "contar" || verbo === "narrar") ? "Contar o Narrar" : verbo.charAt(0).toUpperCase() + verbo.slice(1);
-          videosAReproducir.push(`Palabras/${nombreArchivo}.mp4`);
-          encontrado = true;
-          break;
+        // Saludos simples
+        if (palabra === "hola") {
+            videosAReproducir.push("Palabras/hola.mp4");
+            continue;
         }
-      }
-      if (encontrado) continue;
 
-      // Palabras fijas sueltas
-      for (let fija in palabrasFijas) {
-        if (palabra === fija) {
-          videosAReproducir.push(`Palabras/${palabrasFijas[fija]}.mp4`);
-          break;
+        // Letras
+        const letras = ["a","b","c","d","e","f","g","h","i","j","k","l","ll","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z","ch"];
+        if (letras.includes(palabra)) {
+            videosAReproducir.push(`Palabras/letra${palabra.toUpperCase()}.mp4`);
+            continue;
         }
-      }
-    } // end for
 
-    if (videosAReproducir.length === 0) {
-      console.log('No se encontró video para las palabras ingresadas.');
-      videoSeña.style.display = "none";
-      return;
+        // Verbo conjugado
+        for (let verbo in conjugaciones) {
+            if (conjugaciones[verbo].includes(palabra)) {
+                const nombreArchivo = (verbo === "contar" || verbo === "narrar")
+                    ? "Contar o Narrar"
+                    : verbo.charAt(0).toUpperCase() + verbo.slice(1);
+                videosAReproducir.push(`Palabras/${nombreArchivo}.mp4`);
+                break;
+            }
+        }
+
+        // Palabras fijas sueltas (una sola palabra)
+        for (let fija in palabrasFijas) {
+            if (palabra === fija) {
+                videosAReproducir.push(`Palabras/${palabrasFijas[fija]}.mp4`);
+                break;
+            }
+        }
+
+        // Casos de una sola palabra que están como archivo exacto:
+        // (por si vienen así en el texto y no entran en 'palabrasFijas')
+        const archivosUnaPalabra = [
+            "ayer","hoy","mañana","manana","futuro","pasado","ultimo","último",
+            "minuto","hora","mes","semana","domingo","lunes","martes",
+            "miercoles","miércoles","jueves","viernes","sabado","sábado",
+            "mediodia","mediodía","todavia","todavía","siempre","rapido","rápido",
+            "despacio","temprano","tarde","cerca","derecha","izquierda",
+            "importante","limpio"
+        ];
+        if (archivosUnaPalabra.includes(palabra)) {
+            // Normalizamos a los nombres de archivo que vi en tu carpeta
+            const normalizaciones = {
+                "manana":"mañana", "miercoles":"miercoles", "miércoles":"miercoles",
+                "sabado":"sabado", "sábado":"sabado",
+                "mediodía":"mediodia", "todavía":"todavia",
+                "rápido":"rapido", "último":"ultimo"
+            };
+            const nombre = normalizaciones[palabra] || palabra;
+            videosAReproducir.push(`Palabras/${nombre}.mp4`);
+            continue;
+        }
+
+        // Variantes de "anteayer"
+        if (palabra === "anteayer" || palabra === "antayer") {
+            videosAReproducir.push("Palabras/antayer.mp4"); // según tu captura
+            continue;
+        }
     }
 
     reproducirSecuencialmente(videosAReproducir);
-  }
+}
 
-  // --- Reproducción secuencial con .play().catch(...) ---
-  function reproducirSecuencialmente(lista) {
-    if (!Array.isArray(lista) || lista.length === 0) {
-      videoSeña.style.display = "none";
-      return;
+// ==========================================================
+// ==============  Reproducción secuencial  =================
+// ==========================================================
+
+// ====== Velocidad global (fix) ======
+let currentSpeed = (() => {
+  const sc = document.getElementById("speedControl");
+  const val = sc ? parseFloat(sc.value) : NaN;
+  return Number.isFinite(val) ? val : 0.75;
+})();
+
+function reproducirSecuencialmente(lista) {
+    if (lista.length === 0) {
+        videoSeña.style.display = "none";
+        return;
     }
 
     const path = lista.shift();
-    console.log('Reproduciendo:', path);
-
-    // actualizar fuente
     videoSource.src = path;
-
-    // cargar
-    try { videoSeña.load(); } catch (err) { console.warn('video.load() dio error:', err); }
-
-    // mostrar el video (para que el usuario pueda darle play manual si es necesario)
+    videoSeña.load();
     videoSeña.style.display = "block";
 
-    // ajustar velocidad
-    const velocidad = speedControl ? parseFloat(speedControl.value) || DEFAULT_SPEED : DEFAULT_SPEED;
-    videoSeña.playbackRate = velocidad;
+    // ✅ Usar la velocidad actual elegida por el usuario (no pisar con 0.75)
+    videoSeña.playbackRate = currentSpeed;
 
-    // si ocurre error en la carga, pasar al siguiente
-    videoSeña.onerror = (ev) => {
-      console.error('Error cargando el video:', ev);
-      setTimeout(() => reproducirSecuencialmente(lista), 250);
-    };
-
-    // cuando termine, reproducir siguiente después del delay
-    const DELAY_MS = 100;
     videoSeña.onended = () => {
-      setTimeout(() => reproducirSecuencialmente(lista), DELAY_MS);
+        setTimeout(() => {
+            reproducirSecuencialmente(lista);
+        }, 100); // delay de 100ms
     };
+    videoSeña.play();
+}
 
-    // Intentar reproducir y capturar rechazo (autoplay policies)
-    const playPromise = videoSeña.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          // reproducción iniciada correctamente
-          console.log('play() OK:', path);
-        })
-        .catch((err) => {
-          console.warn('play() rechazado por el navegador (autoplay):', err);
-          // dejar video cargado y visible para que el usuario pulse "play" manualmente:
-          texto.innerHTML = `No se pudo reproducir automáticamente el video. Hacé click en el botón "Reproducir" del video para continuar.`;
-          // el video ya está cargado (videoSource.src), permanecerá visible en pausa
-          try { videoSeña.pause(); } catch(e){/* noop */ }
-          // NO avanzar automáticamente — se esperará a que el usuario pulse play
-        });
-    }
-  }
+// ==========================================================
+// =====================  Extras UI  ========================
+// ==========================================================
 
-  // --- Exponer funciones para debug si querés desde consola ---
-  window._procesarTexto = procesarTextoSecuencial;
-  window._reproducir = reproducirSecuencialmente;
-  window._conjugaciones = conjugaciones;
+// 🎚 Control de velocidad
+const speedControl = document.getElementById("speedControl");
+const speedValue = document.getElementById("speedValue");
 
-}); // end DOMContentLoaded
+// Sincronizar la etiqueta al cargar
+if (speedValue && speedControl) {
+  speedValue.textContent = parseFloat(speedControl.value) + "x";
+}
+
+speedControl.addEventListener("input", () => {
+  currentSpeed = parseFloat(speedControl.value);   // actualizar velocidad global
+  videoSeña.playbackRate = currentSpeed;           // aplicar de inmediato si está reproduciendo
+  speedValue.textContent = currentSpeed + "x";
+});
+
+// 🎤 Indicador de micrófono
+function activarMicrofono() {
+  boton.classList.add("mic-active");
+}
+function desactivarMicrofono() {
+  boton.classList.remove("mic-active");
+}
+
+// ✨ Glow en el texto cuando hay input
+function mostrarTextoReconocido(textoReconocido) {
+  texto.textContent = textoReconocido;
+  texto.classList.add("glow");
+  setTimeout(() => texto.classList.remove("glow"), 1000);
+}
+
+// ♿ Toggle de alto contraste
+const contrastToggle = document.getElementById("contrastToggle");
+contrastToggle.addEventListener("click", () => {
+  document.body.classList.toggle("high-contrast");
+});
